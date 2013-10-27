@@ -42,7 +42,9 @@ enum DateTimeError date_parse(const char *const stDate, struct Date *date) {
   return error_result;
 }
 
-enum DateTimeError time_parse(const char *const stTime, struct Time *time);
+enum DateTimeError time_parse(const char *const stTime, struct Time *time) {
+  return 0;
+}
 
 /*
  * Checks the length of the date string, and will return an error code

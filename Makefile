@@ -5,8 +5,8 @@ DBFLAGS := -g
 
 # Should not have to change anything below here.
 
-CC := gcc
-OUTDIRS := obj
+CC := gcc-4.7
+OUTDIRS := obj tests/obj
 
 SRCFILES := $(wildcard src/*.c)
 
@@ -14,11 +14,14 @@ OBJFILES := $(patsubst src/%.c,obj/%.o,$(SRCFILES))
 DEPFILES := $(patsubst src/%.c,obj/%.d,$(SRCFILES))
 
 # Unit Testing
-UTINC := -I$$HOME/.local/include
+# Make sure it can find the CUnit includes and library
+UTINC := -I/usr/local/Cellar/cunit/2.1-2/include
 UTLIBS := -lcunit
-UTLIBDIR := -L$$HOME/.local/lib
+UTLIBDIR := -L/usr/local/Cellar/cunit/2.1-2/lib
 UTOUTDIRS := tests
+
 UTSRCFILES := $(wildcard tests/src/*.c)
+
 UTOBJFILES := $(patsubst tests/src/%.c,tests/obj/%.o,$(UTSRCFILES))
 UTDEPFILES := $(patsubst tests/src/%.c,tests/obj/%.d,$(UTSRCFILES))
 
@@ -28,6 +31,14 @@ all: dirs $(PROG)
 
 dirs:
 	@mkdir -p $(OUTDIRS)
+
+tests: tests/unittests
+
+tests/unittests: $(UTOBJFILES)
+	$(CC) $(STD) $(UTCFLAGS) $(UTINC) $(UTLIBDIR) -o $@ $^ $(UTLIBS)
+
+tests/obj/%.o: tests/src/%.c
+	$(CC) $(DBFLAGS) $(STD) $(CFLAGS) $(UTINC) $(UTLIBDIR) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
 
 $(PROG): $(OBJFILES)
 ifeq ($(DEBUG),0)

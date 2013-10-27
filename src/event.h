@@ -34,4 +34,20 @@ enum EventError {
   EVENT_INTERNAL_ERROR
 };
 
+/*
+ * Functions
+ */
+
+/*
+ * Create the event.
+ */
+enum EventError event_create(struct Event **new_event,
+                             const char *const stDate,
+                             const char *const stTime,
+                             int duration,
+                             const char *const name,
+                             const char *const location);
+
+void event_destroy(struct Event* event);
+
 #endif
