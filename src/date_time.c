@@ -14,10 +14,15 @@
 
 #define NUM_MONTHS_IN_YEAR 12
 
+#define MAX_HOURS 24
+#define MAX_MINUTES 59
+
 /*
  * Forward declarations.
  */
-static enum DateTimeError check_date_str_length(const char *const stDate);
+static enum DateTimeError check_str_length(const char *const stDate,
+                                           const int min,
+                                           const int max);
 static enum DateTimeError parse_date_string(const char *const stDate,
                                             struct Date *date);
 static enum DateTimeError validate_date(int year, int month, int day);
@@ -25,6 +30,9 @@ static Boolean is_leap_year(int year);
 static enum DateTimeError check_year(int year);
 static enum DateTimeError check_month(int month);
 static enum DateTimeError check_day(int year, int month, int day);
+static enum DateTimeError parse_time_string(const char *const stTime,
+                                            struct Time *time);
+static enum DateTimeError validate_time(int hour, int minutes);
 
 /*
  * Given a pointer to a string, will update the given date.
@@ -33,7 +41,8 @@ static enum DateTimeError check_day(int year, int month, int day);
  */
 enum DateTimeError date_parse(const char *const stDate, struct Date *date) {
   enum DateTimeError error_result;
-  error_result = check_date_str_length(stDate);
+  error_result = check_str_length(stDate, DATETIME_MIN_DATE_STR_LEN,
+                                  DATETIME_MAX_DATE_STR_LEN);
 
   if (error_result == DATETIME_NO_ERROR) {
     error_result = parse_date_string(stDate, date);
@@ -43,22 +52,32 @@ enum DateTimeError date_parse(const char *const stDate, struct Date *date) {
 }
 
 enum DateTimeError time_parse(const char *const stTime, struct Time *time) {
-  return 0;
+  enum DateTimeError error_result;
+  error_result = check_str_length(stTime, DATETIME_MIN_TIME_STR_LEN,
+                                       DATETIME_MAX_TIME_STR_LEN);
+
+  if (error_result == DATETIME_NO_ERROR) {
+    error_result = parse_time_string(stTime, time);
+  }
+
+  return error_result;
 }
 
 /*
  * Checks the length of the date string, and will return an error code
  * if it's too big or small.
  */
-static enum DateTimeError check_date_str_length(const char *const stDate) {
+static enum DateTimeError check_str_length(const char *const stDate,
+                                           const int min,
+                                           const int max) {
   enum DateTimeError error_result;
   int date_str_len;
 
   error_result = DATETIME_NO_ERROR;
-  date_str_len = strnlen(stDate, DATETIME_MAX_STR_LEN);
+  date_str_len = strnlen(stDate, max);
 
-  if (date_str_len != DATETIME_MAX_STR_LEN) {
-    if (date_str_len < DATETIME_MIN_STR_LEN) {
+  if (date_str_len != max) {
+    if (date_str_len < min) {
       error_result = DATETIME_STR_TOO_SHORT;
     }
   } else {
@@ -168,6 +187,8 @@ static enum DateTimeError check_month(int month) {
 
 /*
  * February is the weird one, number of days varies by leap year.
+ *
+ * It is assumed that month verification has been done.
  */
 static enum DateTimeError check_day(int year, int month, int day) {
   /*
@@ -179,7 +200,7 @@ static enum DateTimeError check_day(int year, int month, int day) {
   enum DateTimeError result;
 
   result = DATETIME_NO_ERROR;
-  max_days = days_in_month[month];
+  max_days = days_in_month[month - 1];
 
   if (is_leap_year(year) && (month == 2)) {
     max_days = 29;
@@ -187,6 +208,48 @@ static enum DateTimeError check_day(int year, int month, int day) {
 
   if (max_days < day) {
     result = DATETIME_DAY_INVALID;
+  }
+
+  return result;
+}
+
+static enum DateTimeError parse_time_string(const char *const stTime,
+                                            struct Time *time) {
+  enum DateTimeError error_result;
+  int hour, minutes, scan_result;
+
+  time->hour = 0;
+  time->minutes = 0;
+
+  error_result = DATETIME_NO_ERROR;
+
+  scan_result = sscanf(stTime, "%2d:%2d", &hour, &minutes);
+
+  /* Haven't scanned two integers. */
+  if (scan_result != 2 || scan_result == EOF) {
+    error_result = DATETIME_INVALID;
+  } else {
+    error_result = validate_time(hour, minutes);
+    if (error_result == DATETIME_NO_ERROR) {
+      time->hour = hour;
+      time->minutes = minutes;
+    }
+  }
+
+  return error_result;
+}
+
+static enum DateTimeError validate_time(int hour, int minutes) {
+  enum DateTimeError result;
+
+  result = DATETIME_NO_ERROR;
+
+  if ((hour > MAX_HOURS) || (hour < 0)) {
+    result = DATETIME_HOUR_INVALID;
+  } else if ((MAX_MINUTES > 59) || (minutes < 0)) {
+    result = DATETIME_MINUTES_INVALID;
+  } else if ((hour == MAX_HOURS) && (minutes > 0)) {
+    result = DATETIME_MINUTES_INVALID;
   }
 
   return result;

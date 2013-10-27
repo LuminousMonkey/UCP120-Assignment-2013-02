@@ -14,8 +14,11 @@
  * string is DATETIME_MAX_STR_LEN or greater then it's considered too
  * long.
  */
-#define DATETIME_MIN_STR_LEN 6
-#define DATETIME_MAX_STR_LEN 20
+#define DATETIME_MIN_DATE_STR_LEN 6
+#define DATETIME_MAX_DATE_STR_LEN 20
+
+#define DATETIME_MIN_TIME_STR_LEN 3
+#define DATETIME_MAX_TIME_STR_LEN 8
 
 struct Date {
   int day;
@@ -35,6 +38,8 @@ enum DateTimeError {
   DATETIME_YEAR_INVALID,
   DATETIME_MONTH_INVALID,
   DATETIME_DAY_INVALID,
+  DATETIME_HOUR_INVALID,
+  DATETIME_MINUTES_INVALID,
   DATETIME_INVALID /* If the whole date is invalid. */
 };
 

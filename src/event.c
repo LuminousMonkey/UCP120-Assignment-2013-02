@@ -27,6 +27,7 @@ void event_destroy(struct Event* event);
 /*
  * Creates an event.
  *
+ * Does not everify new_even is not NULL.
  * It is expected that date and time are passed in as strings.
  * The date/time code is supposed to handle parsing those.
  */
@@ -40,6 +41,9 @@ enum EventError event_create(struct Event **new_event,
   error_result = EVENT_NO_ERROR;
 
   *new_event = (struct Event *)malloc(sizeof(struct Event));
+
+  (*new_event)->name = NULL;
+  (*new_event)->location = NULL;
 
   if (*new_event != NULL) {
     if (date_parse(stDate, &(*new_event)->date) == DATETIME_NO_ERROR) {
@@ -65,7 +69,7 @@ enum EventError event_create(struct Event **new_event,
     error_result = EVENT_INTERNAL_ERROR;
   }
 
-  if (error_result != DATETIME_NO_ERROR) {
+  if (error_result != EVENT_NO_ERROR) {
     event_destroy(*new_event);
     *new_event = NULL;
   }
@@ -78,15 +82,23 @@ enum EventError event_set_name(const char *const name, char **event_name) {
   int name_length;
 
   result = EVENT_NO_ERROR;
-  name_length = strnlen(name, MAX_LENGTH_OF_NAME);
+  name_length = 0;
 
-  *event_name = (char *)malloc(name_length + 1);
+  if (name != NULL) {
+    name_length = strnlen(name, MAX_LENGTH_OF_NAME);
+  }
 
-  if (*event_name != NULL) {
-    **event_name = '\0';
-    strncat(*event_name, name, name_length);
+  if (name_length > 0) {
+    *event_name = (char *)malloc(name_length + 1);
+
+    if (*event_name != NULL) {
+      **event_name = '\0';
+      strncat(*event_name, name, name_length);
+    } else {
+      result = EVENT_INTERNAL_ERROR;
+    }
   } else {
-    result = EVENT_INTERNAL_ERROR;
+    result = EVENT_NAME_INVALID;
   }
 
   return result;
@@ -97,16 +109,24 @@ enum EventError event_set_location(const char *const location, char **event_loca
   int location_length;
 
   result = EVENT_NO_ERROR;
-  location_length = strnlen(location, MAX_LENGTH_OF_LOCATION);
+  location_length = 0;
+  *event_location = NULL;
 
-  *event_location = (char *)malloc(location_length + 1);
-
-  if (*event_location != NULL) {
-    **event_location = '\0';
-    strncat(*event_location, location, location_length);
-  } else {
-    result = EVENT_INTERNAL_ERROR;
+  if (location != NULL) {
+    location_length = strnlen(location, MAX_LENGTH_OF_LOCATION);
   }
+
+  if (location_length > 0) {
+    *event_location = (char *)malloc(location_length + 1);
+
+    if (*event_location != NULL) {
+      **event_location = '\0';
+      strncat(*event_location, location, location_length);
+    } else {
+      result = EVENT_INTERNAL_ERROR;
+    }
+  }
+
   return result;
 }
 
