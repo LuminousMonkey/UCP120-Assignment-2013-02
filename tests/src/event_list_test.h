@@ -18,6 +18,6 @@ void test_event_list_create_list();
 void test_event_list_insert_single();
 
 /* Insert a few items, and test the order. */
-/* void test_event_list_insert_multiple(); */
+void test_event_list_insert_multiple();
 
 #endif

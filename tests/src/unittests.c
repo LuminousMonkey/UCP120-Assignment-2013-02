@@ -59,7 +59,10 @@ int main() {
       (NULL == CU_add_test(pEventListSuite, "Test Create Empty Event List",
                            test_event_list_create_list)) ||
       (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Single",
-                           test_event_list_insert_single))
+                           test_event_list_insert_single)) ||
+      (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Multiple",
+                           test_event_list_insert_multiple))
+
       ) {
     CU_cleanup_registry();
     return CU_get_error();
