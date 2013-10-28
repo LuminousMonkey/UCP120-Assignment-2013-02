@@ -5,7 +5,7 @@ DBFLAGS := -g
 
 # Should not have to change anything below here.
 
-CC := gcc-4.7
+CC := gcc
 OUTDIRS := obj tests/obj
 
 SRCFILES := $(wildcard src/*.c)
