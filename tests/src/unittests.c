@@ -1,5 +1,6 @@
 #include <CUnit/Basic.h>
 
+#include "calendar_file_test.h"
 #include "date_test.h"
 #include "event_list_test.h"
 #include "event_test.h"
@@ -9,6 +10,7 @@ int main() {
   CU_pSuite pTimeSuite = NULL;
   CU_pSuite pEventSuite = NULL;
   CU_pSuite pEventListSuite = NULL;
+  CU_pSuite pCalendarFileSuite = NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry()) {
     return CU_get_error();
@@ -18,9 +20,11 @@ int main() {
   pTimeSuite = CU_add_suite("Time Checks", NULL, NULL);
   pEventSuite = CU_add_suite("Event Checks", NULL, NULL);
   pEventListSuite = CU_add_suite("Event List Checks", NULL, NULL);
+  pCalendarFileSuite = CU_add_suite("Calendar File Checks", NULL, NULL);
 
   if ((NULL == pDateSuite) || (NULL == pTimeSuite) ||
-      (NULL == pEventSuite) || (NULL == pEventListSuite)) {
+      (NULL == pEventSuite) || (NULL == pEventListSuite) ||
+      (NULL == pCalendarFileSuite)) {
     CU_cleanup_registry();
     return CU_get_error();
   }
@@ -61,7 +65,9 @@ int main() {
       (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Single",
                            test_event_list_insert_single)) ||
       (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Multiple",
-                           test_event_list_insert_multiple))
+                           test_event_list_insert_multiple)) ||
+      (NULL == CU_add_test(pCalendarFileSuite, "Test Load Calendar File",
+                           test_calendar_load_file))
 
       ) {
     CU_cleanup_registry();
