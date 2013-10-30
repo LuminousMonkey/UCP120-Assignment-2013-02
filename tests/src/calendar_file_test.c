@@ -20,5 +20,5 @@ void test_calendar_load_file() {
 
   error_result = load_calendar(test_list, "data/test.txt");
 
-  CU_ASSERT_EQUAL(FILE_NO_ERROR,error_result);
+  CU_ASSERT_EQUAL(FILE_EOF,error_result);
 }

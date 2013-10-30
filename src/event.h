@@ -21,7 +21,7 @@
  */
 #define EVENT_MAX_DATE_STR_LEN 11
 #define EVENT_MAX_TIME_STR_LEN 6
-#define EVENT_LEADING_FORMAT "%10s %5s %i"
+#define EVENT_LEADING_FORMAT "%10s %5s %i "
 /*
  * Number of fields expected to be read from leading format of event
  * line.
