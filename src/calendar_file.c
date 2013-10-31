@@ -13,7 +13,7 @@
 #include "event_list.h"
 #include "event.h"
 
-#define BUFFER_CHUNK 10
+#define BUFFER_CHUNK 512
 
 /*
  * Our struct for holding all the information about the current calendar file

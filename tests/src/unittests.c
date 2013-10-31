@@ -40,6 +40,8 @@ int main() {
                            testDateParseFebOnNonLeap)) ||
       (NULL == CU_add_test(pDateSuite, "Test error codes correct",
                            testDateParseCorrectErrors)) ||
+      (NULL == CU_add_test(pDateSuite, "Test Date String Output",
+                           testDateStringOutput)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Parse Valid Time",
                            testTimeParseValidTime)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Parse Invalid Time String",

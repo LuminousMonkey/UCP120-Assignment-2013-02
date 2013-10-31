@@ -64,6 +64,20 @@ void testDateParseCorrectErrors() {
   CU_ASSERT_EQUAL(result, DATETIME_YEAR_INVALID);
 }
 
+void testDateStringOutput() {
+  struct Date date;
+  char result[MAX_DATE_STRING];
+
+  date.day = 28;
+  date.month = 10;
+  date.year = 2010;
+
+  dateString( result, &date);
+
+  CU_ASSERT_STRING_EQUAL( "28 October 2010", result );
+
+}
+
 void testTimeParseValidTime() {
   enum DateTimeError result;
   struct Time time_result;

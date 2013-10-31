@@ -17,6 +17,11 @@
 #define MAX_HOURS 24
 #define MAX_MINUTES 59
 
+#define MIDDAY_HOUR 12
+
+/* 18 should be enough for expected strings. */
+#define MAX_DATE_STRING 20
+
 /*
  * Forward declarations.
  */
@@ -61,6 +66,35 @@ enum DateTimeError timeParse( const char *const stTime, struct Time *time ) {
   }
 
   return error_result;
+}
+
+/*
+ * Given a date, and a poiner to an already allocated char array of at
+ * least size MAX_DATE_STRING length, return the formatted date.
+ *
+ * The date is already assumed to be validated.
+ *
+ */
+void dateString( char *const outString, const struct Date *const date ) {
+  char *months[] = {"January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November",
+                    "December"};
+
+  sprintf( outString, "%d %s %d", date->day, months[date->month - 1], date->year );
+}
+
+/*
+ * There is some confusion over 12:00am vs 12:00pm. As per the Wiki
+ *  article:
+ *
+ *  http://en.wikipedia.org/wiki/12-hour_clock#Confusion_at_noon_and_midnight
+ *
+ * Will just go with 00:00 = 12:00am and 12:00 = 12:00pm.
+ */
+void timeString( char *const outString, const struct Time *const time ) {
+  int hours_past_midday;
+
+  hours_past_midday = time->hour % MIDDAY_HOUR;
 }
 
 /*

@@ -9,6 +9,8 @@
 #ifndef DATE_TIME_H_
 #define DATE_TIME_H_
 
+#include "bool.h"
+
 /*
  * The max and min length we expect for date strings. If the date
  * string is DATETIME_MAX_STR_LEN or greater then it's considered too
@@ -19,6 +21,9 @@
 
 #define DATETIME_MIN_TIME_STR_LEN 3
 #define DATETIME_MAX_TIME_STR_LEN 8
+
+/* Max length of buffer for output of date strings */
+#define MAX_DATE_STRING 20
 
 struct Date {
   int day;
@@ -45,5 +50,7 @@ enum DateTimeError {
 
 enum DateTimeError dateParse( const char *const stDate, struct Date *date );
 enum DateTimeError timeParse( const char *const stTime, struct Time *time );
+
+void dateString( char *const outString, const struct Date *const date );
 
 #endif

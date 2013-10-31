@@ -13,6 +13,8 @@ void testDateParseFebOnNonLeap();
 
 void testDateParseCorrectErrors();
 
+void testDateStringOutput();
+
 void testTimeParseValidTime();
 
 void testTimeParseInvalidTime();
