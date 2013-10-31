@@ -19,10 +19,11 @@
 /*
  * Forward declarations.
  */
-static Boolean duration_valid(int duration);
-enum EventError event_set_name(const char *const name, char **event_name);
-enum EventError event_set_location(const char *const name, char **location);
-void event_destroy(struct Event* event);
+static Boolean duration_valid( int duration );
+enum EventError event_set_name( const char *const name, char **event_name );
+enum EventError event_set_location( const char *const name,
+                                    char **location );
+void event_destroy( struct Event* event );
 
 /*
  * Creates an event.
@@ -31,80 +32,108 @@ void event_destroy(struct Event* event);
  * It is expected that date and time are passed in as strings.
  * The date/time code is supposed to handle parsing those.
  */
-enum EventError eventCreate(struct Event **new_event,
+enum EventError eventCreate( struct Event **new_event,
                              const char *const stDate,
                              const char *const stTime,
                              int duration,
                              const char *const name,
-                             const char *const location) {
+                             const char *const location )
+  {
   enum EventError error_result;
   error_result = EVENT_NO_ERROR;
 
-  *new_event = (struct Event *)malloc(sizeof(struct Event));
+  *new_event = ( struct Event * ) malloc( sizeof( struct Event ) );
 
-  (*new_event)->name = NULL;
-  (*new_event)->location = NULL;
+  ( *new_event )->name = NULL;
+  ( *new_event )->location = NULL;
 
-  if (*new_event != NULL) {
-    if (dateParse(stDate, &(*new_event)->date) == DATETIME_NO_ERROR) {
-      if (timeParse(stTime, &(*new_event)->time) == DATETIME_NO_ERROR) {
-        if (duration_valid(duration)) {
-          (*new_event)->duration = duration;
-          if (name != NULL && name[0] != '\0') {
-            event_set_name(name, &(*new_event)->name);
-            event_set_location(location, &(*new_event)->location);
-          } else {
+  if ( *new_event != NULL )
+    {
+    if ( dateParse( stDate, & ( *new_event )->date ) == DATETIME_NO_ERROR )
+      {
+      if ( timeParse( stTime, & ( *new_event )->time ) == DATETIME_NO_ERROR )
+        {
+        if ( duration_valid( duration ) )
+          {
+          ( *new_event )->duration = duration;
+
+          if ( name != NULL && name[0] != '\0' )
+            {
+            event_set_name( name, & ( *new_event )->name );
+            event_set_location( location, & ( *new_event )->location );
+            }
+          else
+            {
             error_result = EVENT_NAME_INVALID;
+            }
           }
-        } else {
+        else
+          {
           error_result = EVENT_DURATION_INVALID;
+          }
         }
-      } else {
+      else
+        {
         error_result = EVENT_TIME_INVALID;
+        }
       }
-    } else {
+    else
+      {
       error_result = EVENT_DATE_INVALID;
+      }
     }
-  } else {
+  else
+    {
     error_result = EVENT_INTERNAL_ERROR;
-  }
+    }
 
-  if (error_result != EVENT_NO_ERROR) {
-    event_destroy(*new_event);
+  if ( error_result != EVENT_NO_ERROR )
+    {
+    event_destroy( *new_event );
     *new_event = NULL;
-  }
+    }
 
   return error_result;
-}
+  }
 
-enum EventError event_set_name(const char *const name, char **event_name) {
+enum EventError event_set_name( const char *const name, char **event_name )
+  {
   enum EventError result;
   int name_length;
 
   result = EVENT_NO_ERROR;
   name_length = 0;
 
-  if (name != NULL) {
-    name_length = strnlen(name, MAX_LENGTH_OF_NAME);
-  }
-
-  if (name_length > 0) {
-    *event_name = (char *)malloc(name_length + 1);
-
-    if (*event_name != NULL) {
-      **event_name = '\0';
-      strncat(*event_name, name, name_length);
-    } else {
-      result = EVENT_INTERNAL_ERROR;
+  if ( name != NULL )
+    {
+    name_length = strnlen( name, MAX_LENGTH_OF_NAME );
     }
-  } else {
+
+  if ( name_length > 0 )
+    {
+    *event_name = ( char * ) malloc( name_length + 1 );
+
+    if ( *event_name != NULL )
+      {
+      **event_name = '\0';
+      strncat( *event_name, name, name_length );
+      }
+    else
+      {
+      result = EVENT_INTERNAL_ERROR;
+      }
+    }
+  else
+    {
     result = EVENT_NAME_INVALID;
-  }
+    }
 
   return result;
-}
+  }
 
-enum EventError event_set_location(const char *const location, char **event_location) {
+enum EventError event_set_location( const char *const location,
+                                    char **event_location )
+  {
   enum EventError result;
   int location_length;
 
@@ -112,23 +141,28 @@ enum EventError event_set_location(const char *const location, char **event_loca
   location_length = 0;
   *event_location = NULL;
 
-  if (location != NULL) {
-    location_length = strnlen(location, MAX_LENGTH_OF_LOCATION);
-  }
-
-  if (location_length > 0) {
-    *event_location = (char *)malloc(location_length + 1);
-
-    if (*event_location != NULL) {
-      **event_location = '\0';
-      strncat(*event_location, location, location_length);
-    } else {
-      result = EVENT_INTERNAL_ERROR;
+  if ( location != NULL )
+    {
+    location_length = strnlen( location, MAX_LENGTH_OF_LOCATION );
     }
-  }
+
+  if ( location_length > 0 )
+    {
+    *event_location = ( char * ) malloc( location_length + 1 );
+
+    if ( *event_location != NULL )
+      {
+      **event_location = '\0';
+      strncat( *event_location, location, location_length );
+      }
+    else
+      {
+      result = EVENT_INTERNAL_ERROR;
+      }
+    }
 
   return result;
-}
+  }
 
 /*
  * Destroys an event.
@@ -136,23 +170,28 @@ enum EventError event_set_location(const char *const location, char **event_loca
  * Frees up the whole event, including any allocated strings for name
  * and location.
  */
-void event_destroy(struct Event* event) {
-  if (event != NULL) {
-    if (event->name != NULL) {
-      free(event->name);
-    }
+void event_destroy( struct Event* event )
+  {
+  if ( event != NULL )
+    {
+    if ( event->name != NULL )
+      {
+      free( event->name );
+      }
 
-    if (event->location != NULL) {
-      free(event->location);
-    }
+    if ( event->location != NULL )
+      {
+      free( event->location );
+      }
 
-    free(event);
+    free( event );
+    }
   }
-}
 
 /*
  * Durations must be a non-negative integer.
  */
-static Boolean duration_valid(int duration) {
-  return (duration >= 0);
-}
+static Boolean duration_valid( int duration )
+  {
+  return ( duration >= 0 );
+  }

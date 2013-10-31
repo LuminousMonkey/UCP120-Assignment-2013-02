@@ -31,18 +31,20 @@
 /*
  * Struct for containing the event.
  */
-struct Event {
+struct Event
+  {
   struct Date date;
   struct Time time;
   int duration;
   char *name;
   char *location; /* Set to null if no location. */
-};
+  };
 
 /*
  * For communicating the type of errors that we might get with events.
  */
-enum EventError {
+enum EventError
+{
   EVENT_NO_ERROR,
   EVENT_DATE_INVALID,
   EVENT_TIME_INVALID,
@@ -59,13 +61,13 @@ enum EventError {
 /*
  * Create the event.
  */
-enum EventError eventCreate(struct Event **new_event,
+enum EventError eventCreate( struct Event **new_event,
                              const char *const stDate,
                              const char *const stTime,
                              int duration,
                              const char *const name,
-                             const char *const location);
+                             const char *const location );
 
-void event_destroy(struct Event* event);
+void event_destroy( struct Event* event );
 
 #endif

@@ -11,7 +11,8 @@
 
 #include "event_list.h"
 
-enum FileError {
+enum FileError
+{
   FILE_NO_ERROR,
   FILE_NOT_EXIST,
   FILE_NOT_READABLE,
@@ -22,10 +23,10 @@ enum FileError {
   FILE_INTERNAL_ERROR
 };
 
-enum FileError loadCalendar(struct EventList *list,
-                             const char *filename);
+enum FileError loadCalendar( struct EventList *list,
+                             const char *filename );
 
-enum FileError saveCalendar(const struct EventList *list,
-                             const char *filename);
+enum FileError saveCalendar( const struct EventList *list,
+                             const char *filename );
 
 #endif

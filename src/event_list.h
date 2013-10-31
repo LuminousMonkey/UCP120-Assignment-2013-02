@@ -17,23 +17,26 @@
  * add new events to the end of the list, and need to go through the
  * list in order.
  */
-struct EventListNode {
+struct EventListNode
+  {
   struct Event *event;
   struct EventListNode *next;
-};
+  };
 
-struct EventList {
+struct EventList
+  {
   struct EventListNode *head;
   struct EventListNode *tail;
   struct EventListNode *current;
-};
+  };
 
 struct EventList *eventListCreate();
-void eventListDestroy(struct EventList *list);
+void eventListDestroy( struct EventList *list );
 
-Boolean eventListInsertLast(struct EventList *list, struct Event *to_insert);
+Boolean eventListInsertLast( struct EventList *list,
+                             struct Event *to_insert );
 
-void eventListResetPosition(struct EventList *list);
-struct Event *eventListNext(struct EventList *list);
+void eventListResetPosition( struct EventList *list );
+struct Event *eventListNext( struct EventList *list );
 
 #endif
