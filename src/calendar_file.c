@@ -81,7 +81,7 @@ enum FileError loadCalendar( struct EventList *list,
 
       if ( !event_insert_success )
         {
-        event_destroy( current_event );
+        eventDestroy( current_event );
         eventListDestroy( list );
         error_result = FILE_INVALID_FORMAT;
         }

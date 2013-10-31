@@ -19,11 +19,11 @@
 /*
  * Forward declarations.
  */
-static Boolean duration_valid( int duration );
-enum EventError event_set_name( const char *const name, char **event_name );
-enum EventError event_set_location( const char *const name,
-                                    char **location );
-void event_destroy( struct Event* event );
+static Boolean durationValid( int duration );
+enum EventError eventSetName( const char *const name, char **event_name );
+enum EventError eventSetLocation( const char *const name,
+                                  char **location );
+void eventDestroy( struct Event *event );
 
 /*
  * Creates an event.
@@ -49,18 +49,18 @@ enum EventError eventCreate( struct Event **new_event,
 
   if ( *new_event != NULL )
     {
-    if ( dateParse( stDate, & ( *new_event )->date ) == DATETIME_NO_ERROR )
+    if ( dateParse( stDate, &( *new_event )->date ) == DATETIME_NO_ERROR )
       {
-      if ( timeParse( stTime, & ( *new_event )->time ) == DATETIME_NO_ERROR )
+      if ( timeParse( stTime, &( *new_event )->time ) == DATETIME_NO_ERROR )
         {
-        if ( duration_valid( duration ) )
+        if ( durationValid( duration ) )
           {
           ( *new_event )->duration = duration;
 
           if ( name != NULL && name[0] != '\0' )
             {
-            event_set_name( name, & ( *new_event )->name );
-            event_set_location( location, & ( *new_event )->location );
+            eventSetName( name, &( *new_event )->name );
+            eventSetLocation( location, & ( *new_event )->location );
             }
           else
             {
@@ -89,17 +89,17 @@ enum EventError eventCreate( struct Event **new_event,
 
   if ( error_result != EVENT_NO_ERROR )
     {
-    event_destroy( *new_event );
+    eventDestroy( *new_event );
     *new_event = NULL;
     }
 
   return error_result;
   }
 
-enum EventError event_set_name( const char *const name, char **event_name )
+enum EventError eventSetName( const char *const name, char **event_name )
   {
   enum EventError result;
-  int name_length;
+  size_t name_length;
 
   result = EVENT_NO_ERROR;
   name_length = 0;
@@ -131,11 +131,11 @@ enum EventError event_set_name( const char *const name, char **event_name )
   return result;
   }
 
-enum EventError event_set_location( const char *const location,
-                                    char **event_location )
+enum EventError eventSetLocation( const char *const location,
+                                  char **event_location )
   {
   enum EventError result;
-  int location_length;
+  size_t location_length;
 
   result = EVENT_NO_ERROR;
   location_length = 0;
@@ -170,7 +170,7 @@ enum EventError event_set_location( const char *const location,
  * Frees up the whole event, including any allocated strings for name
  * and location.
  */
-void event_destroy( struct Event* event )
+void eventDestroy( struct Event *event )
   {
   if ( event != NULL )
     {
@@ -191,7 +191,7 @@ void event_destroy( struct Event* event )
 /*
  * Durations must be a non-negative integer.
  */
-static Boolean duration_valid( int duration )
+static Boolean durationValid( int duration )
   {
   return ( duration >= 0 );
   }

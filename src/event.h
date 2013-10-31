@@ -68,6 +68,6 @@ enum EventError eventCreate( struct Event **new_event,
                              const char *const name,
                              const char *const location );
 
-void event_destroy( struct Event* event );
+void eventDestroy( struct Event *event );
 
 #endif

@@ -45,7 +45,7 @@ void eventListDestroy( struct EventList *list )
   while ( current_node != NULL )
     {
     next_node = current_node->next;
-    event_destroy( current_node->event );
+    eventDestroy( current_node->event );
     free( current_node );
     current_node = next_node;
     }

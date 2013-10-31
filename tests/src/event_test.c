@@ -135,6 +135,6 @@ void testCreateEventNoLocation() {
 }
 
 static void cleanUpEvent(struct Event **event) {
-  event_destroy(*event);
+  eventDestroy(*event);
   *event = NULL;
 }
