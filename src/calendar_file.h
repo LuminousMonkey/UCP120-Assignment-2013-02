@@ -11,8 +11,7 @@
 
 #include "event_list.h"
 
-enum FileError
-{
+enum FileError {
   FILE_NO_ERROR,
   FILE_NOT_EXIST,
   FILE_NOT_READABLE,

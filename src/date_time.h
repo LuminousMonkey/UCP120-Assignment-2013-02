@@ -20,21 +20,18 @@
 #define DATETIME_MIN_TIME_STR_LEN 3
 #define DATETIME_MAX_TIME_STR_LEN 8
 
-struct Date
-  {
+struct Date {
   int day;
   int month;
   int year;
-  };
+};
 
-struct Time
-  {
+struct Time {
   int hour;
   int minutes;
-  };
+};
 
-enum DateTimeError
-{
+enum DateTimeError {
   DATETIME_NO_ERROR,
   DATETIME_STR_TOO_SHORT,
   DATETIME_STR_TOO_LONG,

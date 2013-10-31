@@ -9,8 +9,7 @@
 #ifndef BOOL_H_
 #define BOOL_H_
 
-typedef enum
-{
+typedef enum {
   FALSE,
   TRUE
 } Boolean;
