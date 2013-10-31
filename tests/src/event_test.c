@@ -24,16 +24,16 @@
 /*
  * Forward declarations
  */
-static void clean_up_event(struct Event **event);
+static void cleanUpEvent(struct Event **event);
 
 /*
  * Don't test date or time, they have their own tests.
  */
-void test_create_event() {
+void testCreateEvent() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               73, VALID_NAME, VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result,EVENT_NO_ERROR);
@@ -52,89 +52,89 @@ void test_create_event() {
   /*
    * Test Event destroy as well.
    */
-  clean_up_event(&test_event);
+  cleanUpEvent(&test_event);
 }
 
-void test_create_event_invalid_duration() {
+void testCreateEventInvalidDuration() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               -1, VALID_NAME, VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result, EVENT_DURATION_INVALID);
   CU_ASSERT_PTR_NULL(test_event);
 }
 
-void test_create_event_invalid_time() {
+void testCreateEventInvalidTime() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, VALID_DATE, "24:01",
+  error_result = eventCreate(&test_event, VALID_DATE, "24:01",
                               VALID_DURATION, VALID_NAME, VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result, EVENT_TIME_INVALID);
   CU_ASSERT_PTR_NULL(test_event);
 }
 
-void test_create_event_invalid_date() {
+void testCreateEventInvalidDate() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, "0-01-01", VALID_TIME,
+  error_result = eventCreate(&test_event, "0-01-01", VALID_TIME,
                               VALID_DURATION, VALID_NAME, VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result, EVENT_DATE_INVALID);
   CU_ASSERT_PTR_NULL(test_event);
 }
 
-void test_create_event_invalid_name() {
+void testCreateEventInvalidName() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               VALID_DURATION, "", VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result, EVENT_NAME_INVALID);
   CU_ASSERT_PTR_NULL(test_event);
 
-  clean_up_event(&test_event);
+  cleanUpEvent(&test_event);
 
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               VALID_DURATION, NULL, VALID_LOCATION);
 
   CU_ASSERT_EQUAL(error_result, EVENT_NAME_INVALID);
   CU_ASSERT_PTR_NULL(test_event);
 
-  clean_up_event(&test_event);
+  cleanUpEvent(&test_event);
 }
 
-void test_create_event_no_location() {
+void testCreateEventNoLocation() {
   enum EventError error_result;
   struct Event *test_event;
 
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               VALID_DURATION, VALID_NAME, NULL);
 
   CU_ASSERT_EQUAL(error_result, EVENT_NO_ERROR);
   CU_ASSERT_PTR_NOT_NULL(test_event);
 
-  clean_up_event(&test_event);
+  cleanUpEvent(&test_event);
 
   /*
    * Should be able to handle empty strings.
    * They should just be treated as NULL locations.
    */
-  error_result = event_create(&test_event, VALID_DATE, VALID_TIME,
+  error_result = eventCreate(&test_event, VALID_DATE, VALID_TIME,
                               VALID_DURATION, VALID_NAME, "");
 
   CU_ASSERT_EQUAL(error_result, EVENT_NO_ERROR);
   CU_ASSERT_PTR_NOT_NULL(test_event);
 
-  clean_up_event(&test_event);
+  cleanUpEvent(&test_event);
 }
 
-static void clean_up_event(struct Event **event) {
+static void cleanUpEvent(struct Event **event) {
   event_destroy(*event);
   *event = NULL;
 }

@@ -31,43 +31,45 @@ int main() {
 
   /* add the tests to the suite */
   if ((NULL == CU_add_test(pDateSuite, "Test Parse Valid Date",
-                           test_date_parse_valid_date)) ||
+                           testDateParseValidDate)) ||
       (NULL == CU_add_test(pDateSuite, "Test Parse No of fields Date",
-                           test_date_parse_invalid_no_fields)) ||
+                           testDateParseInvalidNoFields)) ||
       (NULL == CU_add_test(pDateSuite, "Test Parse Feb on leap year",
-                           test_date_parse_feb_on_leap)) ||
+                           testDateParseFebOnLeap)) ||
       (NULL == CU_add_test(pDateSuite, "Test Parse Feb on non leap year",
-                           test_date_parse_feb_on_non_leap)) ||
+                           testDateParseFebOnNonLeap)) ||
       (NULL == CU_add_test(pDateSuite, "Test error codes correct",
-                           test_date_parse_correct_errors)) ||
+                           testDateParseCorrectErrors)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Parse Valid Time",
-                           test_time_parse_valid_time)) ||
+                           testTimeParseValidTime)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Parse Invalid Time String",
-                           test_time_parse_invalid_time)) ||
+                           testTimeParseInvalidTime)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Time Over Max Hours",
-                           test_time_over_max_hours)) ||
+                           testTimeOverMaxHours)) ||
       (NULL == CU_add_test(pTimeSuite, "Test Time No Minutes Over Max",
-                           test_time_no_minutes_over_max)) ||
+                           testTimeNoMinutesOverMax)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Valid Event",
-                           test_create_event)) ||
+                           testCreateEvent)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Event Invalid Duration",
-                           test_create_event_invalid_duration)) ||
+                           testCreateEventInvalidDuration)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Event Invalid Time",
-                           test_create_event_invalid_date)) ||
+                           testCreateEventInvalidDate)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Event Invalid Date",
-                           test_create_event_invalid_time)) ||
+                           testCreateEventInvalidTime)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Event Invalid Name",
-                           test_create_event_invalid_name)) ||
+                           testCreateEventInvalidName)) ||
       (NULL == CU_add_test(pEventSuite, "Test Create Event No Location",
-                           test_create_event_no_location)) ||
+                           testCreateEventNoLocation)) ||
       (NULL == CU_add_test(pEventListSuite, "Test Create Empty Event List",
-                           test_event_list_create_list)) ||
-      (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Single",
-                           test_event_list_insert_single)) ||
+                           testEventListCreateList)) ||
+      (NULL == CU_add_test(pEventListSuite, "Test Event List Insert Single",
+                           testEventListInsertSingle)) ||
+      (NULL == CU_add_test(pEventListSuite, "Test Event List Insert Null",
+                           testEventListInsertNull)) ||
       (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Multiple",
-                           test_event_list_insert_multiple)) ||
+                           testEventListInsertMultiple)) ||
       (NULL == CU_add_test(pCalendarFileSuite, "Test Load Calendar File",
-                           test_calendar_load_file))
+                           testCalendarLoadFile))
 
       ) {
     CU_cleanup_registry();

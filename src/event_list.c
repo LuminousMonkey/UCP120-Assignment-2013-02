@@ -12,7 +12,7 @@
 /*
  * Creates an empty list, returning a pointer to the list.
  */
-struct EventList *event_list_create() {
+struct EventList *eventListCreate() {
   struct EventList *new_list;
 
   new_list = (struct EventList *)malloc(sizeof(struct EventList));
@@ -33,7 +33,7 @@ struct EventList *event_list_create() {
  * have no way of knowing if the pointers for the Events are stored
  * anywhere else in the program.
  */
-void event_list_destroy(struct EventList *list) {
+void eventListDestroy(struct EventList *list) {
   struct EventListNode *current_node;
   struct EventListNode *next_node;
 
@@ -53,7 +53,7 @@ void event_list_destroy(struct EventList *list) {
  * Resets the list so the next call with "next" will return the first
  * event in the list.
  */
-void event_list_reset_position(struct EventList *list) {
+void eventListResetPosition(struct EventList *list) {
   list->current = list->head;
 }
 
@@ -63,7 +63,7 @@ void event_list_reset_position(struct EventList *list) {
  * Returns NULL if no more events.
  * Be sure to use event_list_reset_position first.
  */
-struct Event *event_list_next(struct EventList *list) {
+struct Event *eventListNext(struct EventList *list) {
   struct Event *result;
 
   result = NULL;
@@ -79,31 +79,32 @@ struct Event *event_list_next(struct EventList *list) {
 /*
  * Given a list, add the given event to that list.
  */
-Boolean event_list_insert_last(struct EventList *list, struct Event *to_insert) {
+Boolean eventListInsertLast(struct EventList *list, struct Event *to_insert) {
   struct EventListNode *new_node;
   Boolean result;
 
   result = FALSE;
+  if (to_insert != NULL) {
+    new_node = (struct EventListNode *)malloc(sizeof(struct EventListNode));
 
-  new_node = (struct EventListNode *)malloc(sizeof(struct EventListNode));
+    if (new_node != NULL) {
+      new_node->event = to_insert;
+      new_node->next = NULL;
 
-  if (new_node != NULL) {
-    new_node->event = to_insert;
-    new_node->next = NULL;
+      /*
+       * First item inserted into list.
+       */
+      if (list->head == NULL) {
+        list->head = new_node;
+      }
 
-    /*
-     * First item inserted into list.
-     */
-    if (list->head == NULL) {
-      list->head = new_node;
+      if (list->tail != NULL) {
+        list->tail->next = new_node;
+      }
+
+      list->tail = new_node;
+      result = TRUE;
     }
-
-    if (list->tail != NULL) {
-      list->tail->next = new_node;
-    }
-
-    list->tail = new_node;
-    result = TRUE;
   }
 
   return result;

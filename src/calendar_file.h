@@ -22,10 +22,10 @@ enum FileError {
   FILE_INTERNAL_ERROR
 };
 
-enum FileError load_calendar(struct EventList *list,
+enum FileError loadCalendar(struct EventList *list,
                              const char *filename);
 
-enum FileError save_calendar(const struct EventList *list,
+enum FileError saveCalendar(const struct EventList *list,
                              const char *filename);
 
 #endif

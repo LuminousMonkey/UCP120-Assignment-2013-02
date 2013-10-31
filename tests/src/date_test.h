@@ -3,22 +3,22 @@
 
 #include "date_time.h"
 
-void test_date_parse_valid_date();
+void testDateParseValidDate();
 
-void test_date_parse_invalid_no_fields();
+void testDateParseInvalidNoFields();
 
-void test_date_parse_feb_on_leap();
+void testDateParseFebOnLeap();
 
-void test_date_parse_feb_on_non_leap();
+void testDateParseFebOnNonLeap();
 
-void test_date_parse_correct_errors();
+void testDateParseCorrectErrors();
 
-void test_time_parse_valid_time();
+void testTimeParseValidTime();
 
-void test_time_parse_invalid_time();
+void testTimeParseInvalidTime();
 
-void test_time_over_max_hours();
+void testTimeOverMaxHours();
 
-void test_time_no_minutes_over_max();
+void testTimeNoMinutesOverMax();
 
 #endif

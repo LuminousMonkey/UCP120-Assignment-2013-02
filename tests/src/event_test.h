@@ -3,16 +3,16 @@
 
 #include "event.h"
 
-void test_create_event();
+void testCreateEvent();
 
-void test_create_event_invalid_duration();
+void testCreateEventInvalidDuration();
 
-void test_create_event_invalid_time();
+void testCreateEventInvalidTime();
 
-void test_create_event_invalid_date();
+void testCreateEventInvalidDate();
 
-void test_create_event_invalid_name();
+void testCreateEventInvalidName();
 
-void test_create_event_no_location();
+void testCreateEventNoLocation();
 
 #endif

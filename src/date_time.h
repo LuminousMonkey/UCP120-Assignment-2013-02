@@ -43,7 +43,7 @@ enum DateTimeError {
   DATETIME_INVALID /* If the whole date is invalid. */
 };
 
-enum DateTimeError date_parse(const char *const stDate, struct Date *date);
-enum DateTimeError time_parse(const char *const stTime, struct Time *time);
+enum DateTimeError dateParse(const char *const stDate, struct Date *date);
+enum DateTimeError timeParse(const char *const stTime, struct Time *time);
 
 #endif

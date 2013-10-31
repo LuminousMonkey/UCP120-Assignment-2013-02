@@ -28,12 +28,12 @@ struct EventList {
   struct EventListNode *current;
 };
 
-struct EventList *event_list_create();
-void event_list_destroy(struct EventList *list);
+struct EventList *eventListCreate();
+void eventListDestroy(struct EventList *list);
 
-Boolean event_list_insert_last(struct EventList *list, struct Event *to_insert);
+Boolean eventListInsertLast(struct EventList *list, struct Event *to_insert);
 
-void event_list_reset_position(struct EventList *list);
-struct Event *event_list_next(struct EventList *list);
+void eventListResetPosition(struct EventList *list);
+struct Event *eventListNext(struct EventList *list);
 
 #endif

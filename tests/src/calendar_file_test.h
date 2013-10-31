@@ -9,6 +9,6 @@
 #ifndef CALENDAR_FILE_TEST_H_
 #define CALENDAR_FILE_TEST_H_
 
-void test_calendar_load_file();
+void testCalendarLoadFile();
 
 #endif

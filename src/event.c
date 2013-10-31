@@ -31,7 +31,7 @@ void event_destroy(struct Event* event);
  * It is expected that date and time are passed in as strings.
  * The date/time code is supposed to handle parsing those.
  */
-enum EventError event_create(struct Event **new_event,
+enum EventError eventCreate(struct Event **new_event,
                              const char *const stDate,
                              const char *const stTime,
                              int duration,
@@ -46,8 +46,8 @@ enum EventError event_create(struct Event **new_event,
   (*new_event)->location = NULL;
 
   if (*new_event != NULL) {
-    if (date_parse(stDate, &(*new_event)->date) == DATETIME_NO_ERROR) {
-      if (time_parse(stTime, &(*new_event)->time) == DATETIME_NO_ERROR) {
+    if (dateParse(stDate, &(*new_event)->date) == DATETIME_NO_ERROR) {
+      if (timeParse(stTime, &(*new_event)->time) == DATETIME_NO_ERROR) {
         if (duration_valid(duration)) {
           (*new_event)->duration = duration;
           if (name != NULL && name[0] != '\0') {

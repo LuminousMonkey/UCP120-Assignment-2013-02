@@ -59,7 +59,7 @@ enum EventError {
 /*
  * Create the event.
  */
-enum EventError event_create(struct Event **new_event,
+enum EventError eventCreate(struct Event **new_event,
                              const char *const stDate,
                              const char *const stTime,
                              int duration,

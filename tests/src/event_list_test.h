@@ -12,12 +12,15 @@
 #include "event_list.h"
 
 /* Create an empty list */
-void test_event_list_create_list();
+void testEventListCreateList();
 
 /* Insert a single item into the list, and that it's the head and tail */
-void test_event_list_insert_single();
+void testEventListInsertSingle();
 
 /* Insert a few items, and test the order. */
-void test_event_list_insert_multiple();
+void testEventListInsertMultiple();
+
+/* List should not add NULLs */
+void testEventListInsertNull();
 
 #endif
