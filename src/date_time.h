@@ -24,6 +24,7 @@
 
 /* Max length of buffer for output of date strings */
 #define MAX_DATE_STRING 20
+#define MAX_TIME_STRING 8
 
 struct Date {
   int day;
@@ -52,5 +53,6 @@ enum DateTimeError dateParse( const char *const stDate, struct Date *date );
 enum DateTimeError timeParse( const char *const stTime, struct Time *time );
 
 void dateString( char *const outString, const struct Date *const date );
+void timeString( char *const outString, const struct Time *const time );
 
 #endif

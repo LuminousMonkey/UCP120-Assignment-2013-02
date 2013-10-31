@@ -19,9 +19,6 @@
 
 #define MIDDAY_HOUR 12
 
-/* 18 should be enough for expected strings. */
-#define MAX_DATE_STRING 20
-
 /*
  * Forward declarations.
  */
@@ -78,9 +75,11 @@ enum DateTimeError timeParse( const char *const stTime, struct Time *time ) {
 void dateString( char *const outString, const struct Date *const date ) {
   char *months[] = {"January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November",
-                    "December"};
+                    "December"
+                   };
 
-  sprintf( outString, "%d %s %d", date->day, months[date->month - 1], date->year );
+  sprintf( outString, "%d %s %d", date->day, months[date->month - 1],
+           date->year );
 }
 
 /*
@@ -92,9 +91,26 @@ void dateString( char *const outString, const struct Date *const date ) {
  * Will just go with 00:00 = 12:00am and 12:00 = 12:00pm.
  */
 void timeString( char *const outString, const struct Time *const time ) {
-  int hours_past_midday;
+  int hour_12;
+  const char *meridies;
 
-  hours_past_midday = time->hour % MIDDAY_HOUR;
+  if ( time->hour > 11 ) {
+    meridies = "pm";
+  } else {
+    meridies = "am";
+  }
+
+  hour_12 = ( time->hour % 12 );
+
+  if ( hour_12 == 0 ) {
+    hour_12 = 12;
+  }
+
+  if ( time->minutes == 0 ) {
+    sprintf( outString, "%d%s", hour_12, meridies );
+  } else {
+    sprintf( outString, "%d:%d%s", hour_12, time->minutes, meridies );
+  }
 }
 
 /*

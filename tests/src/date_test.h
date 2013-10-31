@@ -23,4 +23,6 @@ void testTimeOverMaxHours();
 
 void testTimeNoMinutesOverMax();
 
+void testTimeStringOutput();
+
 #endif
