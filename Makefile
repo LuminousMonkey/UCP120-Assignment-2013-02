@@ -15,9 +15,8 @@ DEPFILES := $(patsubst src/%.c,obj/%.d,$(SRCFILES))
 
 # Unit Testing
 # Make sure it can find the CUnit includes and library
-UTINC := -I/usr/local/Cellar/cunit/2.1-2/include
-UTLIBS := -lcunit
-UTLIBDIR := -L/usr/local/Cellar/cunit/2.1-2/lib
+UTCFLAGS := -g
+UTLIBS := $(shell pkg-config --cflags --libs cunit)
 UTOUTDIRS := tests
 
 UTSRCFILES := $(wildcard tests/src/*.c)
@@ -35,10 +34,10 @@ dirs:
 tests: tests/unittests
 
 tests/unittests: $(UTOBJFILES)
-	$(CC) $(STD) $(UTCFLAGS) $(UTINC) $(UTLIBDIR) -o $@ $^ $(UTLIBS)
+	$(CC) $(STD) $(UTCFLAGS) -o $@ $^ $(UTLIBS)
 
 tests/obj/%.o: tests/src/%.c
-	$(CC) $(DBFLAGS) $(STD) $(CFLAGS) $(UTINC) $(UTLIBDIR) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
+	$(CC) $(DBFLAGS) $(STD) $(CFLAGS) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
 
 $(PROG): $(OBJFILES)
 ifeq ($(DEBUG),0)
