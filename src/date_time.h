@@ -25,6 +25,7 @@
 /* Max length of buffer for output of date strings */
 #define MAX_DATE_STRING 20
 #define MAX_TIME_STRING 8
+#define MAX_DURATION_STRING 20
 
 struct Date {
   int day;

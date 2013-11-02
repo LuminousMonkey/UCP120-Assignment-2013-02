@@ -1,6 +1,6 @@
 PROG := ucp-assignment
-LIBS :=
-CFLAGS := -MMD -pedantic -Wall -Wextra
+LIBS := $(shell pkg-config --libs gtk+-2.0)
+CFLAGS := -MMD -pedantic -Wall -Wextra $(shell pkg-config --cflags gtk+-2.0)
 DBFLAGS := -g
 
 # Should not have to change anything below here.

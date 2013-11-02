@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "event_list.h"
 
@@ -107,6 +108,65 @@ Boolean eventListInsertLast( struct EventList *list,
 
       list->tail = new_node;
       result = TRUE;
+    }
+  }
+
+  return result;
+}
+
+/*
+ * Returns a pointer to the string of the entire calendar list,
+ * formatted as specified in the assignment spec.
+ *
+ * It will allocate the memory, but it is expected that the caller
+ * frees it using free().
+ */
+char *eventListString(struct EventList *list) {
+  int current_size, num_of_events;
+  struct Event *current_event;
+  char *result;
+
+  result = NULL;
+
+  if (list->head != NULL) {
+    current_size = 0;
+    num_of_events = 0;
+
+    eventListResetPosition(list);
+    current_event = eventListNext(list);
+
+    while (current_event != NULL) {
+      current_size += current_event->formatted_string_length;
+      num_of_events++;
+      current_event = eventListNext(list);
+    }
+
+    /*
+     * Allocate memory for the whole string of formatted events.
+     *
+     * This includes 6 extra characters per entry for the formatting.
+     * The last entry only has 5 (no line space. But has terminator.)
+     * TODO: No Magic numbers.
+     */
+    current_size += (6 * num_of_events) - 1;
+
+    result = (char *)malloc(current_size);
+
+    if (result != NULL) {
+      eventListResetPosition(list);
+      current_event = eventListNext(list);
+      *result = '\0';
+
+      while (current_event != NULL) {
+        strncat(result, current_event->formatted_string,
+                current_event->formatted_string_length);
+        if (list->current != NULL) {
+          strcat(result, "\n---\n\n");
+        } else {
+          strcat(result, "\n---");
+        }
+        current_event = eventListNext(list);
+      }
     }
   }
 

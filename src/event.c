@@ -7,6 +7,7 @@
  * is through these.
  */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,6 +20,7 @@
 /*
  * Forward declarations.
  */
+static int eventString(struct Event *const event, char **const outString);
 static Boolean durationValid( int duration );
 enum EventError eventSetName( const char *const name, char **event_name );
 enum EventError eventSetLocation( const char *const name,
@@ -43,10 +45,11 @@ enum EventError eventCreate( struct Event **new_event,
 
   *new_event = ( struct Event * ) malloc( sizeof( struct Event ) );
 
-  ( *new_event )->name = NULL;
-  ( *new_event )->location = NULL;
-
   if ( *new_event != NULL ) {
+    ( *new_event )->name = NULL;
+    ( *new_event )->location = NULL;
+    (*new_event)->formatted_string = NULL;
+
     if ( dateParse( stDate, &( *new_event )->date ) == DATETIME_NO_ERROR ) {
       if ( timeParse( stTime, &( *new_event )->time ) == DATETIME_NO_ERROR ) {
         if ( durationValid( duration ) ) {
@@ -55,6 +58,8 @@ enum EventError eventCreate( struct Event **new_event,
           if ( name != NULL && name[0] != '\0' ) {
             eventSetName( name, &( *new_event )->name );
             eventSetLocation( location, & ( *new_event )->location );
+
+            (*new_event)->formatted_string_length = eventString(*new_event, &(*new_event)->formatted_string);
           } else {
             error_result = EVENT_NAME_INVALID;
           }
@@ -67,16 +72,81 @@ enum EventError eventCreate( struct Event **new_event,
     } else {
       error_result = EVENT_DATE_INVALID;
     }
+
+    /* Clean up if any errors occured */
+    if ( error_result != EVENT_NO_ERROR ) {
+      eventDestroy( *new_event );
+      *new_event = NULL;
+    }
   } else {
     error_result = EVENT_INTERNAL_ERROR;
   }
 
-  if ( error_result != EVENT_NO_ERROR ) {
-    eventDestroy( *new_event );
-    *new_event = NULL;
+  return error_result;
+}
+
+/*
+ * Produces a string that represets the event as per the assignment
+ * spec. Takes a pointer to an event and a char string pointer.
+ * Allocates the memory for the event string. Also returns an int that
+ * is the size of the string (excluding the terminator.)
+ *
+ * This has to be called everytime an event is created or edited.
+ *
+ * It's doubling up storage space, but it makes building up the string
+ * for all the events a bit easier.
+ */
+static int eventString(struct Event *const event, char **const outString) {
+  int string_length;
+
+  char date_string[MAX_DATE_STRING];
+  char time_string[MAX_TIME_STRING];
+  char duration_string[MAX_DURATION_STRING];
+
+  string_length = strlen(event->name) + 1;
+
+  if (event->location != NULL) {
+    string_length += strlen(event->location) + 3;
   }
 
-  return error_result;
+  durationString(duration_string, event->duration);
+  string_length += strnlen(duration_string, MAX_DURATION_STRING) + 1;
+
+  dateString(date_string, &event->date);
+  string_length += strnlen(date_string, MAX_DATE_STRING) + 2;
+
+  timeString(time_string, &event->time);
+  string_length += strnlen(time_string, MAX_TIME_STRING);
+
+  /*
+   * Allocate the string (+1 for terminator, returned string size does
+   * not include this.)
+   */
+  *outString = (char *)malloc(string_length + 1);
+
+  /* Can't recover from a memory error like this. */
+  assert(outString != NULL);
+
+  /* String building here */
+  **outString = '\0';
+  strcat(*outString, event->name);
+  strcat(*outString, " ");
+
+  if (event->location != NULL) {
+    /* Add the location string */
+    strcat(*outString, "@ ");
+    strcat(*outString, event->location);
+    strcat(*outString, " ");
+  }
+
+  strncat(*outString, duration_string, MAX_DURATION_STRING);
+  strcat(*outString, "\n");
+  strncat(*outString, date_string, MAX_DATE_STRING);
+
+  strcat(*outString, ", ");
+  strncat(*outString, time_string, MAX_TIME_STRING);
+
+  return string_length;
 }
 
 enum EventError eventSetName( const char *const name, char **event_name ) {
@@ -147,6 +217,10 @@ void eventDestroy( struct Event *event ) {
 
     if ( event->location != NULL ) {
       free( event->location );
+    }
+
+    if (event->formatted_string != NULL ) {
+      free(event->formatted_string);
     }
 
     free( event );

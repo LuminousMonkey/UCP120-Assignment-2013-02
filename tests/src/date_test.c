@@ -146,7 +146,7 @@ void testTimeStringOutput() {
 }
 
 void testDurationStringOutput() {
-  char result[1024];
+  char result[MAX_DURATION_STRING];
 
   durationString(result, 75);
   CU_ASSERT_STRING_EQUAL( "(1 hour, 15 minutes)", result);

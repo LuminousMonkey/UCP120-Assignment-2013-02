@@ -35,6 +35,14 @@ Boolean eventListInsertLast( struct EventList *list,
                              struct Event *to_insert );
 
 void eventListResetPosition( struct EventList *list );
+
+/*
+ * When called, returns the next event in the list. It is expected
+ * that the list has been reset to the start, via
+ * eventListResetPosition.
+ */
 struct Event *eventListNext( struct EventList *list );
+
+char *eventListString(struct EventList *list);
 
 #endif

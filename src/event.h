@@ -37,6 +37,8 @@ struct Event {
   int duration;
   char *name;
   char *location; /* Set to null if no location. */
+  char *formatted_string;
+  int formatted_string_length;
 };
 
 /*
