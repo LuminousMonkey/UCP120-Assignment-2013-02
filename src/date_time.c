@@ -19,12 +19,19 @@
 
 #define MIDDAY_HOUR 12
 
+#define MINUTES_IN_HOURS 60
+
+#define HOUR_DESC_SINGULAR "hour"
+#define HOUR_DESC_PLURAL "hours"
+#define MINUTE_DESC_SINGULAR "minute"
+#define MINUTE_DESC_PLURAL "minutes"
+
 /*
  * Forward declarations.
  */
 static enum DateTimeError checkStrLength( const char *const stDate,
-    const size_t min,
-    const size_t max );
+                                            const size_t min,
+                                            const size_t max );
 static enum DateTimeError parseDateString( const char *const stDate,
     struct Date *date );
 static enum DateTimeError validateDate( int year, int month, int day );
@@ -65,18 +72,10 @@ enum DateTimeError timeParse( const char *const stTime, struct Time *time ) {
   return error_result;
 }
 
-/*
- * Given a date, and a poiner to an already allocated char array of at
- * least size MAX_DATE_STRING length, return the formatted date.
- *
- * The date is already assumed to be validated.
- *
- */
 void dateString( char *const outString, const struct Date *const date ) {
-  char *months[] = {"January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November",
-                    "December"
-                   };
+  const char *const months[] = {"January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November",
+                                "December" };
 
   sprintf( outString, "%d %s %d", date->day, months[date->month - 1],
            date->year );
@@ -110,6 +109,51 @@ void timeString( char *const outString, const struct Time *const time ) {
     sprintf( outString, "%d%s", hour_12, meridies );
   } else {
     sprintf( outString, "%d:%d%s", hour_12, time->minutes, meridies );
+  }
+}
+
+/*
+ * TODO: Find max possible string length and enforce it.
+ */
+void durationString(char *const outString, int duration) {
+  int hours, minutes;
+  char *hour_description, *minute_description;
+
+  hours = duration / MINUTES_IN_HOURS;
+  minutes = duration % MINUTES_IN_HOURS;
+
+  if (hours > 1) {
+    hour_description = HOUR_DESC_PLURAL;
+  } else {
+    hour_description = HOUR_DESC_SINGULAR;
+  }
+
+  if (minutes > 1) {
+    minute_description = MINUTE_DESC_PLURAL;
+  } else {
+    minute_description = MINUTE_DESC_SINGULAR;
+  }
+
+  /*
+   * Check that either we have only minutes, or only hours.
+   */
+  if ((hours != 0) != (minutes != 0)) {
+    /* We have just to output hours or minutes, not both */
+    int single_time_unit;
+    const char *single_time_unit_desc;
+
+    if (hours != 0) {
+      single_time_unit = hours;
+      single_time_unit_desc = hour_description;
+    } else {
+      single_time_unit = minutes;
+      single_time_unit_desc = minute_description;
+    }
+
+    sprintf(outString, "(%d %s)", single_time_unit, single_time_unit_desc);
+  } else {
+    /* We have both */
+    sprintf(outString, "(%d %s, %d %s)", hours, hour_description, minutes, minute_description );
   }
 }
 

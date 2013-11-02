@@ -52,6 +52,8 @@ int main() {
                               testTimeNoMinutesOverMax ) ) ||
        ( NULL == CU_add_test( pTimeSuite, "Test Time String Output",
                               testTimeStringOutput ) ) ||
+       ( NULL == CU_add_test( pTimeSuite, "Test Duration String Output",
+                              testDurationStringOutput ) ) ||
        ( NULL == CU_add_test( pEventSuite, "Test Create Valid Event",
                               testCreateEvent ) ) ||
        ( NULL == CU_add_test( pEventSuite, "Test Create Event Invalid Duration",

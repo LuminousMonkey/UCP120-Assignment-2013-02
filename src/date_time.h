@@ -52,7 +52,25 @@ enum DateTimeError {
 enum DateTimeError dateParse( const char *const stDate, struct Date *date );
 enum DateTimeError timeParse( const char *const stTime, struct Time *time );
 
+/*
+ * Given a date, and a poiner to an already allocated char array of at
+ * least size MAX_DATE_STRING length, return the formatted date.
+ *
+ * The date is already assumed to be validated.
+ *
+ */
 void dateString( char *const outString, const struct Date *const date );
+
+/*
+ * Given a date, and a pointer to an already allocated char array of
+ * at least size MAX_TIME_STRING length, return a formatted date.
+ */
 void timeString( char *const outString, const struct Time *const time );
+
+/*
+ * Given an int that represents a valid duration, return the string of
+ * that duration formatted as specified in the assignment spec.
+ */
+void durationString(char *const outString, int duration);
 
 #endif

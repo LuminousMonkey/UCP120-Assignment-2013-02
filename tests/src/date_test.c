@@ -144,3 +144,19 @@ void testTimeStringOutput() {
   CU_ASSERT_STRING_EQUAL( "12pm", result );
 
 }
+
+void testDurationStringOutput() {
+  char result[1024];
+
+  durationString(result, 75);
+  CU_ASSERT_STRING_EQUAL( "(1 hour, 15 minutes)", result);
+
+  durationString(result, 45);
+  CU_ASSERT_STRING_EQUAL( "(45 minutes)", result);
+
+  durationString(result, 5);
+  CU_ASSERT_STRING_EQUAL( "(5 minutes)", result);
+
+  durationString(result, 25920);
+  CU_ASSERT_STRING_EQUAL( "(432 hours)", result);
+}
