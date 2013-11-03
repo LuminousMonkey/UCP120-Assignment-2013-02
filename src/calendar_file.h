@@ -19,12 +19,16 @@
 
 /*
  * Used for reporting errors back to the caller.
+ *
+ * No tests for seeing if we can read or write to a file. Either we
+ * are able to open the file, or we can't. If we can't, then it will
+ * return a non-specific FILE_ERROR.
+ *
+ * FILE_INTERNAL_ERROR is a non-expected, probably non-recoverable error.
+ * Try your best to clean up as much as possible.
  */
 enum FileError {
   FILE_NO_ERROR,
-  FILE_NOT_EXIST,
-  FILE_NOT_READABLE,
-  FILE_NOT_WRITABLE,
   FILE_EOF,
   FILE_ERROR,
   FILE_INVALID_FORMAT,

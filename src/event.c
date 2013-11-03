@@ -98,7 +98,7 @@ enum EventError eventCreate(struct Event **new_event,
  * for all the events a bit easier.
  */
 static int eventString(struct Event *const event, char **const outString) {
-  int string_length;
+  size_t string_length;
 
   char date_string[MAX_DATE_STRING];
   char time_string[MAX_TIME_STRING];
