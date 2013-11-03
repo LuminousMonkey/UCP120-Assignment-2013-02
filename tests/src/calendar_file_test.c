@@ -16,9 +16,9 @@ void testCalendarLoadFile() {
 
   test_list = eventListCreate();
 
-  CU_ASSERT_PTR_NOT_NULL( test_list );
+  CU_ASSERT_PTR_NOT_NULL(test_list);
 
-  error_result = loadCalendar( test_list, "data/test.txt" );
+  error_result = loadCalendar(test_list, "data/test.txt");
 
-  CU_ASSERT_EQUAL( FILE_EOF, error_result );
+  CU_ASSERT_EQUAL(FILE_EOF, error_result);
 }

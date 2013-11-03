@@ -61,13 +61,13 @@ enum EventError {
 /*
  * Create the event.
  */
-enum EventError eventCreate( struct Event **new_event,
-                             const char *const stDate,
-                             const char *const stTime,
-                             int duration,
-                             const char *const name,
-                             const char *const location );
+enum EventError eventCreate(struct Event **new_event,
+                            const char *const stDate,
+                            const char *const stTime,
+                            int duration,
+                            const char *const name,
+                            const char *const location);
 
-void eventDestroy( struct Event *event );
+void eventDestroy(struct Event *event);
 
 #endif

@@ -3,6 +3,7 @@
  *
  * Author: Mike Aldred
  *
+ * Implementation of reading from, and writing to calendar files.
  */
 
 #include <stdio.h>
@@ -13,6 +14,11 @@
 #include "event_list.h"
 #include "event.h"
 
+/*
+ * Name and location are variable length strings. BUFFER_CHUNK is the
+ * initial size of the buffer we use to load them from the calendar
+ * file.
+ */
 #define BUFFER_CHUNK 512
 
 /*
@@ -20,86 +26,93 @@
  * we're loading.
  */
 struct CalendarFile {
-  /* Our buffer for reading in variable length strings */
-  char *read_buffer;
-  int buffer_size;
+  char *read_buffer; /* Our buffer for reading in variable length strings. */
+  int buffer_size; /* Our read buffer for variable length strings. */
   FILE *current_file;
-  /* Error status of last read event */
-  enum EventError event_error;
+  enum EventError event_error; /* Error status of last read event. */
 };
 
 /*
  * Forward declarations.
  */
-static enum FileError readEventFromFile( struct CalendarFile *calendar_file,
-    struct Event **loaded_event );
-static enum FileError readVariableLengthString( struct CalendarFile
-    *calendar_file );
+static enum FileError readEventFromFile(struct CalendarFile *calendar_file,
+                                        struct Event **loaded_event);
+static enum FileError readVariableLengthString(struct CalendarFile
+    *calendar_file);
 
 /*
  * Load the given calendar file into the list.
- *
- * The list must be initalised.
  */
-enum FileError loadCalendar( struct EventList *list,
-                             const char *filename ) {
+enum FileError loadCalendar(struct EventList *list,
+                            const char *filename) {
   enum FileError error_result;
   struct CalendarFile calendar_file;
 
   error_result = FILE_NO_ERROR;
 
-  calendar_file.buffer_size = 0;
-  calendar_file.current_file = fopen( filename, "rb" );
+  /*
+   *Check for NULL filename, empty strings will return FILE_NOT_EXIST
+   * error.
+   */
+  if (filename != NULL) {
 
-  if ( calendar_file.current_file != NULL ) {
-    struct Event *current_event;
-    Boolean event_insert_success = FALSE;
+    calendar_file.buffer_size = 0;
+    calendar_file.current_file = fopen(filename, "rb");
+    calendar_file.event_error = EVENT_NO_ERROR;
 
-    /* Allocate our starting buffer for reading variable length strings */
-    calendar_file.read_buffer = ( char * ) malloc( BUFFER_CHUNK );
+    if (calendar_file.current_file != NULL) {
+      struct Event *current_event;
+      current_event = NULL;
+      Boolean event_insert_success = FALSE;
 
-    if ( calendar_file.read_buffer != NULL ) {
-      calendar_file.buffer_size = BUFFER_CHUNK;
+      /* Allocate our starting buffer for reading variable length strings */
+      calendar_file.read_buffer = (char *) malloc(BUFFER_CHUNK);
 
-      do {
-        error_result = readEventFromFile( &calendar_file,
-                                          &current_event );
+      if (calendar_file.read_buffer != NULL) {
+        calendar_file.buffer_size = BUFFER_CHUNK;
 
-        if ( error_result == FILE_NO_ERROR ) {
-          event_insert_success = eventListInsertLast( list, current_event );
+        do {
+          error_result = readEventFromFile(&calendar_file,
+                                           &current_event);
+
+          if (error_result == FILE_NO_ERROR) {
+            event_insert_success = eventListInsertLast(list, current_event);
+          }
+        } while ((calendar_file.event_error == EVENT_NO_ERROR) &&
+                 (error_result == FILE_NO_ERROR) &&
+                 event_insert_success);
+
+        if (!event_insert_success) {
+          eventDestroy(current_event);
+          eventListDestroy(list);
+          error_result = FILE_INVALID_FORMAT;
         }
-      } while ( ( calendar_file.event_error == EVENT_NO_ERROR ) &&
-                ( error_result == FILE_NO_ERROR ) &&
-                event_insert_success );
 
-      if ( !event_insert_success ) {
-        eventDestroy( current_event );
-        eventListDestroy( list );
-        error_result = FILE_INVALID_FORMAT;
+        free(calendar_file.read_buffer);
+      } else {
+        error_result = FILE_INTERNAL_ERROR;
       }
 
-      free( calendar_file.read_buffer );
+      fclose(calendar_file.current_file);
     } else {
-      error_result = FILE_INTERNAL_ERROR;
+      error_result = FILE_ERROR;
     }
-
-    fclose( calendar_file.current_file );
   } else {
-    error_result = FILE_ERROR;
+    error_result = FILE_NO_FILENAME;
   }
 
   return error_result;
 }
 
-enum FileError save_calendar( const struct EventList *list,
-                              const char *filename );
+enum FileError save_calendar(const struct EventList *list,
+                             const char *filename);
 
 /*
  * From the current position of the file, tries to read in an
  * event.
  */
-static enum FileError readEventFromFile( struct CalendarFile *calendar_file,
-    struct Event **loaded_event ) {
+static enum FileError readEventFromFile(struct CalendarFile *calendar_file,
+                                        struct Event **loaded_event) {
   enum FileError error_result;
   char date[EVENT_MAX_DATE_STR_LEN], time[EVENT_MAX_TIME_STR_LEN];
   int duration, read_result;
@@ -113,58 +126,58 @@ static enum FileError readEventFromFile( struct CalendarFile *calendar_file,
    * EVENT_MAX_TIME_STR_LEN determine the values to use in this format
    * string.
    */
-  read_result = fscanf( calendar_file->current_file, EVENT_LEADING_FORMAT,
-                        date, time, &duration );
+  read_result = fscanf(calendar_file->current_file, EVENT_LEADING_FORMAT,
+                       date, time, &duration);
 
-  if ( read_result == EVENT_LEADING_FORMAT_QTY ) {
+  if (read_result == EVENT_LEADING_FORMAT_QTY) {
     char *temp_name, *temp_location;
     size_t name_string_length, location_string_length;
 
     temp_name = NULL;
     temp_location = NULL;
 
-    readVariableLengthString( calendar_file );
+    readVariableLengthString(calendar_file);
 
-    name_string_length = strnlen( calendar_file->read_buffer,
-                                  calendar_file->buffer_size );
+    name_string_length = strnlen(calendar_file->read_buffer,
+                                 calendar_file->buffer_size);
 
-    temp_name = ( char * ) malloc( name_string_length + 1 );
+    temp_name = (char *) malloc(name_string_length + 1);
 
-    if ( temp_name != NULL ) {
+    if (temp_name != NULL) {
       *temp_name = '\0';
 
-      strncat( temp_name, calendar_file->read_buffer, name_string_length );
+      strncat(temp_name, calendar_file->read_buffer, name_string_length);
     }
 
-    readVariableLengthString( calendar_file );
+    readVariableLengthString(calendar_file);
 
-    location_string_length = strnlen( calendar_file->read_buffer,
-                                      calendar_file->buffer_size );
+    location_string_length = strnlen(calendar_file->read_buffer,
+                                     calendar_file->buffer_size);
 
-    if ( location_string_length > 0 ) {
-      temp_location = ( char * ) malloc( location_string_length + 1 );
+    if (location_string_length > 0) {
+      temp_location = (char *) malloc(location_string_length + 1);
 
-      if ( temp_location != NULL ) {
+      if (temp_location != NULL) {
         *temp_location = '\0';
 
-        strncat( temp_location, calendar_file->read_buffer, location_string_length );
+        strncat(temp_location, calendar_file->read_buffer, location_string_length);
       }
     }
 
     /* Create the event */
-    calendar_file->event_error = eventCreate( loaded_event, date, time, duration,
-                                 temp_name, temp_location );
+    calendar_file->event_error = eventCreate(loaded_event, date, time, duration,
+                                 temp_name, temp_location);
 
-    if ( temp_location != NULL ) {
-      free( temp_location );
+    if (temp_location != NULL) {
+      free(temp_location);
     }
 
-    if ( temp_name != NULL ) {
-      free( temp_name );
+    if (temp_name != NULL) {
+      free(temp_name);
     }
   } else {
     /* Check it it's because we hit the end of file */
-    if ( feof( calendar_file->current_file ) ) {
+    if (feof(calendar_file->current_file)) {
       error_result = FILE_EOF;
     } else {
       error_result = FILE_INVALID_FORMAT;
@@ -178,8 +191,8 @@ static enum FileError readEventFromFile( struct CalendarFile *calendar_file,
  * From the current position of the file, read in a variable length string.
  * up to a newline character, or end of file.
  */
-static enum FileError readVariableLengthString( struct CalendarFile
-    *calendar_file ) {
+static enum FileError readVariableLengthString(struct CalendarFile
+    *calendar_file) {
   enum FileError error_result;
   size_t length;
   int buffer_space_remaining;
@@ -193,23 +206,23 @@ static enum FileError readVariableLengthString( struct CalendarFile
   current_buffer_position = calendar_file->read_buffer;
   buffer_space_remaining = calendar_file->buffer_size;
 
-  while ( not_upto_eol ) {
-    read_result = fgets( current_buffer_position, buffer_space_remaining,
-                         calendar_file->current_file );
+  while (not_upto_eol) {
+    read_result = fgets(current_buffer_position, buffer_space_remaining,
+                        calendar_file->current_file);
 
-    if ( read_result != NULL ) {
+    if (read_result != NULL) {
 
-      length = strnlen( calendar_file->read_buffer,
-                        calendar_file->buffer_size - 1 );
+      length = strnlen(calendar_file->read_buffer,
+                       calendar_file->buffer_size - 1);
 
       /* We read until the end of the line? */
-      if ( calendar_file->read_buffer[length - 1] == '\n' ) {
+      if (calendar_file->read_buffer[length - 1] == '\n') {
         calendar_file->read_buffer[length - 1] = '\0';
         not_upto_eol = FALSE;
       } else {
         /* Reallocate */
-        calendar_file->read_buffer = ( char * ) realloc( calendar_file->read_buffer,
-                                     calendar_file->buffer_size * 2 );
+        calendar_file->read_buffer = (char *) realloc(calendar_file->read_buffer,
+                                     calendar_file->buffer_size * 2);
         /* Total size remaining (including space used by terminator) */
         buffer_space_remaining = calendar_file->buffer_size + 1;
         current_buffer_position = calendar_file->read_buffer +
@@ -218,7 +231,7 @@ static enum FileError readVariableLengthString( struct CalendarFile
       }
     } else {
       /* EOF or Error */
-      if ( feof( calendar_file->current_file ) ) {
+      if (feof(calendar_file->current_file)) {
         error_result = FILE_EOF;
       } else {
         error_result = FILE_ERROR;

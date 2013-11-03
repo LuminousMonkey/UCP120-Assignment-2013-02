@@ -15,7 +15,7 @@
 
 #include "gui.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   struct AssignmentState state;
 
   state.event_list = eventListCreate();
@@ -28,7 +28,8 @@ int main(int argc, char* argv[]) {
     load_result = loadCalendar(state.event_list, argv[1]);
 
     if (load_result != FILE_NO_ERROR && load_result != FILE_EOF) {
-      state.error = "There was an loading calendar file, starting with empty calendar.";
+      state.error =
+        "There was an loading calendar file, starting with empty calendar.";
     }
   }
 

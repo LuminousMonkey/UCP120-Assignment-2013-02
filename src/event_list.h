@@ -29,19 +29,19 @@ struct EventList {
 };
 
 struct EventList *eventListCreate();
-void eventListDestroy( struct EventList *list );
+void eventListDestroy(struct EventList *list);
 
-Boolean eventListInsertLast( struct EventList *list,
-                             struct Event *to_insert );
+Boolean eventListInsertLast(struct EventList *list,
+                            struct Event *to_insert);
 
-void eventListResetPosition( struct EventList *list );
+void eventListResetPosition(struct EventList *list);
 
 /*
  * When called, returns the next event in the list. It is expected
  * that the list has been reset to the start, via
  * eventListResetPosition.
  */
-struct Event *eventListNext( struct EventList *list );
+struct Event *eventListNext(struct EventList *list);
 
 char *eventListString(struct EventList *list);
 

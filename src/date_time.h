@@ -50,8 +50,8 @@ enum DateTimeError {
   DATETIME_INVALID /* If the whole date is invalid. */
 };
 
-enum DateTimeError dateParse( const char *const stDate, struct Date *date );
-enum DateTimeError timeParse( const char *const stTime, struct Time *time );
+enum DateTimeError dateParse(const char *const stDate, struct Date *date);
+enum DateTimeError timeParse(const char *const stTime, struct Time *time);
 
 /*
  * Given a date, and a poiner to an already allocated char array of at
@@ -60,13 +60,13 @@ enum DateTimeError timeParse( const char *const stTime, struct Time *time );
  * The date is already assumed to be validated.
  *
  */
-void dateString( char *const outString, const struct Date *const date );
+void dateString(char *const outString, const struct Date *const date);
 
 /*
  * Given a date, and a pointer to an already allocated char array of
  * at least size MAX_TIME_STRING length, return a formatted date.
  */
-void timeString( char *const outString, const struct Time *const time );
+void timeString(char *const outString, const struct Time *const time);
 
 /*
  * Given an int that represents a valid duration, return the string of

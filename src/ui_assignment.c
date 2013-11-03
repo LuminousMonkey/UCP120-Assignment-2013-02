@@ -35,7 +35,8 @@ void uiSetup(struct AssignmentState *state) {
 
   uiSetCalendarText(state);
 
-  addButton(state->main_window, LOAD_BUTTON_LABEL, &uiLoadCalendar, (void *)state);
+  addButton(state->main_window, LOAD_BUTTON_LABEL, &uiLoadCalendar,
+            (void *)state);
   /*  addButton(state->main_window, SAVE_BUTTON_LABEL, &uiSaveCalendar, (void *)state);
   addButton(state->main_window, ADD_BUTTON_LABEL, &uiAddCalendar, (void *)state);
   addButton(state->main_window, EDIT_BUTTON_LABEL, &uiEditCalendar, (void *)state);
@@ -75,7 +76,8 @@ static void uiLoadCalendar(void *inData) {
   dialog_properties.maxLength = MAX_FILENAME_LENGTH;
   dialog_properties.isMultiLine = FALSE;
 
-  dialogBox(state->main_window, LOAD_CALENDAR_TITLE, 1, &dialog_properties, dialog_inputs);
+  dialogBox(state->main_window, LOAD_CALENDAR_TITLE, 1, &dialog_properties,
+            dialog_inputs);
 
   eventListDestroy(state->event_list);
   state->event_list = eventListCreate();

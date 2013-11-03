@@ -16,9 +16,9 @@
 struct EventList *eventListCreate() {
   struct EventList *new_list;
 
-  new_list = ( struct EventList * ) malloc( sizeof( struct EventList ) );
+  new_list = (struct EventList *) malloc(sizeof(struct EventList));
 
-  if ( new_list != NULL ) {
+  if (new_list != NULL) {
     new_list->head = NULL;
     new_list->tail = NULL;
     new_list->current = NULL;
@@ -34,27 +34,27 @@ struct EventList *eventListCreate() {
  * have no way of knowing if the pointers for the Events are stored
  * anywhere else in the program.
  */
-void eventListDestroy( struct EventList *list ) {
+void eventListDestroy(struct EventList *list) {
   struct EventListNode *current_node;
   struct EventListNode *next_node;
 
   current_node = list->head;
 
-  while ( current_node != NULL ) {
+  while (current_node != NULL) {
     next_node = current_node->next;
-    eventDestroy( current_node->event );
-    free( current_node );
+    eventDestroy(current_node->event);
+    free(current_node);
     current_node = next_node;
   }
 
-  free( list );
+  free(list);
 }
 
 /*
  * Resets the list so the next call with "next" will return the first
  * event in the list.
  */
-void eventListResetPosition( struct EventList *list ) {
+void eventListResetPosition(struct EventList *list) {
   list->current = list->head;
 }
 
@@ -64,12 +64,12 @@ void eventListResetPosition( struct EventList *list ) {
  * Returns NULL if no more events.
  * Be sure to use event_list_reset_position first.
  */
-struct Event *eventListNext( struct EventList *list ) {
+struct Event *eventListNext(struct EventList *list) {
   struct Event *result;
 
   result = NULL;
 
-  if ( list->current != NULL ) {
+  if (list->current != NULL) {
     result = list->current->event;
     list->current = list->current->next;
   }
@@ -80,29 +80,29 @@ struct Event *eventListNext( struct EventList *list ) {
 /*
  * Given a list, add the given event to that list.
  */
-Boolean eventListInsertLast( struct EventList *list,
-                             struct Event *to_insert ) {
+Boolean eventListInsertLast(struct EventList *list,
+                            struct Event *to_insert) {
   struct EventListNode *new_node;
   Boolean result;
 
   result = FALSE;
 
-  if ( to_insert != NULL ) {
-    new_node = ( struct EventListNode * ) malloc( sizeof(
-                 struct EventListNode ) );
+  if (to_insert != NULL) {
+    new_node = (struct EventListNode *) malloc(sizeof(
+                 struct EventListNode));
 
-    if ( new_node != NULL ) {
+    if (new_node != NULL) {
       new_node->event = to_insert;
       new_node->next = NULL;
 
       /*
        * First item inserted into list.
        */
-      if ( list->head == NULL ) {
+      if (list->head == NULL) {
         list->head = new_node;
       }
 
-      if ( list->tail != NULL ) {
+      if (list->tail != NULL) {
         list->tail->next = new_node;
       }
 
@@ -160,11 +160,13 @@ char *eventListString(struct EventList *list) {
       while (current_event != NULL) {
         strncat(result, current_event->formatted_string,
                 current_event->formatted_string_length);
+
         if (list->current != NULL) {
           strcat(result, "\n---\n\n");
         } else {
           strcat(result, "\n---");
         }
+
         current_event = eventListNext(list);
       }
     }
