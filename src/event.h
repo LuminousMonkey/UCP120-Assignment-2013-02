@@ -9,25 +9,21 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 
-#include "date_time.h"
+#include <stdlib.h>
 
-/*
- * Max string length with terminator.
- *
- * If these are updated, update the format string for the fscanf call
- * in calendar_file.c Unfortunately the c preprocessor doesn't let you
- * stringify % easily, so we have to hardcode the string here rather
- * than build it up from the existing constants.
- */
-#define EVENT_MAX_DATE_STR_LEN 11
-#define EVENT_MAX_TIME_STR_LEN 6
-#define EVENT_LEADING_FORMAT "%10s %5s %i "
+#include "date_time.h"
 
 /*
  * Number of fields expected to be read from leading format of event
  * line.
  */
 #define EVENT_LEADING_FORMAT_QTY 3
+
+/*
+ * We must have at least this number of characters to consider the
+ * name a valid length.
+ */
+#define EVENT_NAME_MIN_LENGTH 3
 
 /*
  * Struct for containing the event.

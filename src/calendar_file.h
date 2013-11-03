@@ -24,6 +24,8 @@
  * are able to open the file, or we can't. If we can't, then it will
  * return a non-specific FILE_ERROR.
  *
+ * FILE_NOTHING_READ is returned when an empty string has been read.
+ *
  * FILE_INTERNAL_ERROR is a non-expected, probably non-recoverable error.
  * Try your best to clean up as much as possible.
  */
@@ -33,6 +35,7 @@ enum FileError {
   FILE_ERROR,
   FILE_INVALID_FORMAT,
   FILE_NO_FILENAME,
+  FILE_EMPTY_LIST,
   FILE_INTERNAL_ERROR
 };
 
@@ -45,6 +48,9 @@ enum FileError {
  *
  * Returns and error status, FILE_NO_ERROR and FILE_EOF mean there
  * were no errors.
+ *
+ * If there was an error, then it's up to the caller of this function to
+ * clean up and create a new empty list.
  */
 enum FileError loadCalendar(struct EventList *list,
                             const char *filename);
@@ -57,7 +63,13 @@ enum FileError loadCalendar(struct EventList *list,
  *
  * filename - A string of the calendar file to save.
  */
-enum FileError saveCalendar(const struct EventList *list,
+enum FileError saveCalendar(struct EventList *list,
                             const char *filename);
+
+/*
+ * Given a file error, return a string that at least describes the
+ * error a little bit.
+ */
+char *errorString(enum FileError file_error);
 
 #endif

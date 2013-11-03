@@ -33,6 +33,9 @@ struct EventList *eventListCreate() {
  * This will also destroy any Events stored on that list, since we
  * have no way of knowing if the pointers for the Events are stored
  * anywhere else in the program.
+ *
+ * It's up the the caller to set the list pointer to NULL (or to
+ * create a new empty list).
  */
 void eventListDestroy(struct EventList *list) {
   struct EventListNode *current_node;
@@ -43,9 +46,13 @@ void eventListDestroy(struct EventList *list) {
   while (current_node != NULL) {
     next_node = current_node->next;
     eventDestroy(current_node->event);
+    current_node->next = NULL;
     free(current_node);
     current_node = next_node;
   }
+
+  list->head = NULL;
+  list->tail = NULL;
 
   free(list);
 }

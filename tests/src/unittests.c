@@ -75,7 +75,14 @@ int main() {
       (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Multiple",
                            testEventListInsertMultiple)) ||
       (NULL == CU_add_test(pCalendarFileSuite, "Test Load Calendar File",
-                           testCalendarLoadFile))
+                           testCalendarLoadFile)) ||
+      (NULL == CU_add_test(pCalendarFileSuite, "Test Load Invalid Calendar Files",
+                           testCalendarLoadInvalidFiles)) ||
+      (NULL == CU_add_test(pCalendarFileSuite, "Test Save Calendar File",
+                           testCalendarSaveFile)) ||
+      (NULL == CU_add_test(pCalendarFileSuite, "Test Save Calendar Over Dir",
+                           testCalendarSaveOverDir))
+
      ) {
     CU_cleanup_registry();
     return CU_get_error();

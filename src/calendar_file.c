@@ -33,6 +33,14 @@
 #define EVENT_LEADING_FORMAT "%10s %5s %i "
 
 /*
+ * Module Ident
+ *
+ * Just a string used to identify this particular module, for
+ * reporting errors.
+ */
+#define MODULE_IDENT "Calendar File: "
+
+/*
  * Our struct for holding all the information about the current calendar file
  * we're loading.
  *
@@ -55,9 +63,12 @@ struct CalendarFile {
  * Forward declarations.
  */
 static enum FileError readEventFromFile(struct Event **loaded_event,
-                                        struct CalendarFile *calendar_file);
-static enum FileError readVariableLengthString(struct CalendarFile
-                                               *calendar_file);
+                                          struct CalendarFile *calendar_file);
+static enum FileError readEventName(char **temp_name,
+                                      struct CalendarFile *calendar_file);
+static enum FileError readVariableLengthString(struct CalendarFile *calendar_file);
+static enum FileError readEventLocation(char** temp_location,
+                                          struct CalendarFile *calendar_file);
 
 /*
  * Load the given calendar file into the list.
@@ -108,7 +119,7 @@ enum FileError loadCalendar(struct EventList *list,
                                                 &calendar_file);
 
           /* No errors reading the event, try adding it to the list. */
-          if (file_error_result == FILE_NO_ERROR) {
+          if (calendar_file.event_error == EVENT_NO_ERROR) {
             event_insert_success = eventListInsertLast(list, current_event);
           }
         } while ((calendar_file.event_error == EVENT_NO_ERROR) &&
@@ -124,14 +135,11 @@ enum FileError loadCalendar(struct EventList *list,
         }
 
         /*
-         * If we couldn't insert the event into the list, this is most
-         * probably a non-recoverable error. Try to clean up best we
-         * can.
+         * If there was an error with inserting the last event.
+         * Free the memory.
          */
         if (!event_insert_success) {
           eventDestroy(current_event);
-          eventListDestroy(list);
-          file_error_result = FILE_INTERNAL_ERROR;
         }
 
         /* Clean up our reading buffer */
@@ -156,8 +164,92 @@ enum FileError loadCalendar(struct EventList *list,
   return file_error_result;
 }
 
-enum FileError save_calendar(const struct EventList *list,
-                             const char *filename);
+/*
+ * Save the calendar events a the given filename.
+ */
+enum FileError saveCalendar(struct EventList *list,
+                             const char *filename) {
+  enum FileError file_error_result;
+  FILE *output_file;
+  struct Event *current_event;
+
+  if (list->head != NULL) {
+    if (filename != NULL) {
+      file_error_result = FILE_NO_ERROR;
+
+      output_file = fopen(filename, "wb");
+
+      if (output_file != NULL) {
+        eventListResetPosition(list);
+        current_event = eventListNext(list);
+
+        while (current_event != NULL) {
+          fprintf(output_file, "%04d-%02d-%02d %02d:%02d %d %s\n",
+                  current_event->date.year,
+                  current_event->date.month,
+                  current_event->date.day,
+                  current_event->time.hour,
+                  current_event->time.minutes,
+                  current_event->duration,
+                  current_event->name);
+
+          if (current_event->location != NULL) {
+            fprintf(output_file, "%s\n", current_event->location);
+          }
+
+          fprintf(output_file, "\n");
+
+          current_event = eventListNext(list);
+        }
+      } else {
+        file_error_result = FILE_ERROR;
+      }
+    } else {
+      file_error_result = FILE_NO_FILENAME;
+    }
+  } else {
+    file_error_result = FILE_EMPTY_LIST;
+  }
+
+  return file_error_result;
+}
+
+/*
+ * Takes a file error, and returns a string that represents the text
+ * of that error.
+ */
+char *errorString(enum FileError file_error) {
+  char *error_text;
+
+  switch(file_error) {
+    case FILE_NO_ERROR:
+      error_text = MODULE_IDENT "No error.";
+      break;
+    case FILE_EOF:
+      error_text = MODULE_IDENT "EOF reached.";
+      break;
+    case FILE_ERROR:
+      error_text = MODULE_IDENT "Unable to read/write file.";
+      break;
+    case FILE_INVALID_FORMAT:
+      error_text = MODULE_IDENT "File has invalid format.";
+      break;
+    case FILE_NO_FILENAME:
+      error_text = MODULE_IDENT "Blank filename provided.";
+      break;
+    case FILE_INTERNAL_ERROR:
+      error_text = MODULE_IDENT "Internal error, trying to recover.";
+      break;
+    case FILE_EMPTY_LIST:
+      error_text = MODULE_IDENT "Attempted to save empty list.";
+      break;
+    default:
+      error_text = MODULE_IDENT "This is really bad, you've invented an error I don't know!";
+      break;
+  }
+
+  return error_text;
+}
 
 /*
  * Tries to read an event from the current file position.
@@ -183,7 +275,7 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
   char date[EVENT_MAX_DATE_STR_LEN], time[EVENT_MAX_TIME_STR_LEN];
   int duration, read_result;
 
-  file_error_result = FILE_NO_ERROR;
+  calendar_file->event_error = EVENT_READ_ERROR;
 
   /*
    * Scan in the first line of the event.
@@ -197,7 +289,6 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
    */
   if (read_result == EVENT_LEADING_FORMAT_QTY) {
     char *temp_name, *temp_location;
-    size_t name_string_length, location_string_length;
 
     temp_name = NULL;
     temp_location = NULL;
@@ -205,66 +296,36 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
     /*
      * Read in the event name string, variable length. The read buffer
      * will be expanded as necessary, up until it hits a newline.
+     * Names must end with a newline, otherwise it's an invalid file
+     * format.
      */
-    file_error_result = readVariableLengthString(calendar_file);
+    file_error_result = readEventName(&temp_name, calendar_file);
 
-    /*
-     * If we don't get an error, then we continue processing. If we
-     * do, we don't have to do anything else, just make sure the error
-     * gets returned.
-     */
     if (file_error_result == FILE_NO_ERROR) {
-      name_string_length = strnlen(calendar_file->read_buffer,
-                                   calendar_file->buffer_size);
-
-      temp_name = (char *) malloc(name_string_length + 1);
-
-      if (temp_name != NULL) {
-        *temp_name = '\0';
-
-        strncat(temp_name, calendar_file->read_buffer, name_string_length);
-      }
-
-      file_error_result = readVariableLengthString(calendar_file);
-
-      location_string_length = strnlen(calendar_file->read_buffer,
-                                       calendar_file->buffer_size);
-
-      if (location_string_length > 0) {
-        temp_location = (char *) malloc(location_string_length + 1);
-
-        if (temp_location != NULL) {
-          *temp_location = '\0';
-
-          strncat(temp_location, calendar_file->read_buffer, location_string_length);
-        }
-      }
-
-      /* Create the event */
-      calendar_file->event_error = eventCreate(loaded_event, date, time, duration,
-                                               temp_name, temp_location);
-
-      if (temp_location != NULL) {
-        free(temp_location);
-      }
-
-      if (temp_name != NULL) {
-        free(temp_name);
-      }
-    } else {
-      /*
-       * We got a read error when we didn't expect it. If it was an
-       * EOF, then the file format is wrong, otherwise it's an actual
-       * read error.
-       */
-      if (file_error_result == FILE_EOF ) {
-        file_error_result = FILE_INVALID_FORMAT;
-      }
+      file_error_result = readEventLocation(&temp_location, calendar_file);
     }
+
+    if (file_error_result == FILE_EOF || file_error_result == FILE_NO_ERROR) {
+      /*
+       * We might have hit the end of the file, but we still have a
+       * valid event name, so we might still have a valid event.
+       */
+      calendar_file->event_error = eventCreate(loaded_event, date, time, duration,
+                                   temp_name, temp_location);
+    }
+
+    if (temp_location != NULL) {
+      free(temp_location);
+    }
+
+    if (temp_name != NULL) {
+      free(temp_name);
+    }
+
   } else {
     /*
      * Didn't get the start of an event when we expected one.
-     * If we get an EOF here, it probably means that we've got no more entries.
+     * If we get anm EOF here, it probably means that we've got no more entries.
      */
     if (feof(calendar_file->current_file)) {
       file_error_result = FILE_EOF;
@@ -277,14 +338,101 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
 }
 
 /*
+ * Attempts to read the event name from the current file position.
+ *
+ * temp_name - Returns a character pointer to the name string of the event.
+ * calendar_file - Calendar file struct for holding our read buffer, etc.
+ *
+ */
+static enum FileError readEventName(char **temp_name,
+                                    struct CalendarFile *calendar_file) {
+  enum FileError file_error_result;
+  size_t name_string_length;
+
+  file_error_result = readVariableLengthString(calendar_file);
+
+  /*
+   * Reading the EOF is fine, as long as we have a valid name string
+   * still.
+   */
+  if ((file_error_result == FILE_NO_ERROR) ||
+      (file_error_result == FILE_EOF)) {
+
+    name_string_length = strnlen(calendar_file->read_buffer,
+                                 calendar_file->buffer_size);
+
+    /*
+     * If we don't have a certain number of characters for the name,
+     * file format is invalid.
+     */
+    if (name_string_length < EVENT_NAME_MIN_LENGTH) {
+      file_error_result = FILE_INVALID_FORMAT;
+    } else {
+      /*
+       * Allocate a temporary string to hold the name until we can create an event.
+       */
+      *temp_name = (char *) malloc(name_string_length + 1);
+
+      if (*temp_name != NULL) {
+        **temp_name = '\0';
+
+        strncat(*temp_name, calendar_file->read_buffer, name_string_length);
+      } else {
+        file_error_result = FILE_INTERNAL_ERROR;
+      }
+    }
+  }
+
+  return file_error_result;
+}
+
+/*
+ * Attempts to read the event location from the current file position.
+ *
+ * temp_location - Returns a character pointer to the location string
+ *                 of the event.
+ * calendar_file - Calendar file struct for holding our read buffer,
+ *                 etc.
+ */
+static enum FileError readEventLocation(char** temp_location,
+                                        struct CalendarFile *calendar_file) {
+  enum FileError file_error_result;
+  size_t location_string_length;
+
+  file_error_result = readVariableLengthString(calendar_file);
+
+  if (file_error_result == FILE_NO_ERROR) {
+    location_string_length = strnlen(calendar_file->read_buffer,
+                                     calendar_file->buffer_size);
+
+    if (location_string_length > 1) {
+      *temp_location = (char *) malloc(location_string_length + 1);
+
+      if (*temp_location != NULL) {
+        **temp_location = '\0';
+
+        strncat(*temp_location, calendar_file->read_buffer, location_string_length);
+      } else {
+        file_error_result = FILE_INTERNAL_ERROR;
+      }
+    }
+  }
+
+  return file_error_result;
+}
+
+/*
  * From the current position of the file, read in a variable length string.
  * up to a newline character, or end of file.
+ *
+ * We will get a needless expansion of the read buffer if we hit the
+ * EOF without getting a newline character before it.
  *
  * An EOF here is not an error, but has to be returned as a separate
  * code so the caller knows to stop reading the file.
  */
 static enum FileError readVariableLengthString(struct CalendarFile
-                                               *calendar_file) {
+    *calendar_file) {
   enum FileError error_result;
   size_t length;
   int buffer_space_remaining;
@@ -325,9 +473,13 @@ static enum FileError readVariableLengthString(struct CalendarFile
       /* EOF or Error */
       if (feof(calendar_file->current_file)) {
         error_result = FILE_EOF;
+        not_upto_eol = FALSE;
       } else {
         error_result = FILE_ERROR;
       }
+
+      /* Be sure to terminate the buffer string */
+      *current_buffer_position = '\0';
     }
   }
 

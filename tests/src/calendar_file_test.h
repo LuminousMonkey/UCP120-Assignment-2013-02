@@ -11,4 +11,10 @@
 
 void testCalendarLoadFile();
 
+void testCalendarLoadInvalidFiles();
+
+void testCalendarSaveFile();
+
+void testCalendarSaveOverDir();
+
 #endif

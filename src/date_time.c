@@ -197,8 +197,6 @@ static enum DateTimeError parseDateString(const char *const stDate,
   date->month = 0;
   date->day = 0;
 
-  error_result = DATETIME_NO_ERROR;
-
   scan_result = sscanf(stDate, "%4d-%2d-%2d", &year, &month, &day);
 
   /* Haven't scanned three integers, then it's a problem. */
@@ -319,8 +317,6 @@ static enum DateTimeError parseTimeString(const char *const stTime,
 
   time->hour = 0;
   time->minutes = 0;
-
-  error_result = DATETIME_NO_ERROR;
 
   scan_result = sscanf(stTime, "%2d:%2d", &hour, &minutes);
 
