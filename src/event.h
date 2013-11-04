@@ -26,6 +26,13 @@
 #define EVENT_NAME_MIN_LENGTH 3
 
 /*
+ * Max length for name and location strings, and buffers must be this
+ * size plus 1.
+ */
+#define MAX_LENGTH_OF_NAME 1024
+#define MAX_LENGTH_OF_LOCATION 1024
+
+/*
  * Struct for containing the event.
  */
 struct Event {

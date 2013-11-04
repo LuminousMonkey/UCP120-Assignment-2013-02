@@ -63,18 +63,20 @@ struct CalendarFile {
  * Forward declarations.
  */
 static enum FileError readEventFromFile(struct Event **loaded_event,
-                                          struct CalendarFile *calendar_file);
+                                        struct CalendarFile *calendar_file);
 static enum FileError readEventName(char **temp_name,
-                                      struct CalendarFile *calendar_file);
-static enum FileError readVariableLengthString(struct CalendarFile *calendar_file);
-static enum FileError readEventLocation(char** temp_location,
-                                          struct CalendarFile *calendar_file);
+                                    struct CalendarFile *calendar_file);
+static enum FileError readVariableLengthString(struct CalendarFile
+    *calendar_file);
+static enum FileError readEventLocation(char **temp_location,
+                                        struct CalendarFile *calendar_file);
 
 /*
  * Load the given calendar file into the list.
  */
 enum FileError loadCalendar(struct EventList *list,
-                            const char *filename) {
+                            const char *filename)
+{
   enum FileError file_error_result;
   struct CalendarFile calendar_file;
 
@@ -168,7 +170,8 @@ enum FileError loadCalendar(struct EventList *list,
  * Save the calendar events a the given filename.
  */
 enum FileError saveCalendar(struct EventList *list,
-                             const char *filename) {
+                            const char *filename)
+{
   enum FileError file_error_result;
   FILE *output_file;
   struct Event *current_event;
@@ -218,34 +221,36 @@ enum FileError saveCalendar(struct EventList *list,
  * Takes a file error, and returns a string that represents the text
  * of that error.
  */
-char *errorString(enum FileError file_error) {
+char *errorString(enum FileError file_error)
+{
   char *error_text;
 
-  switch(file_error) {
-    case FILE_NO_ERROR:
-      error_text = MODULE_IDENT "No error.";
-      break;
-    case FILE_EOF:
-      error_text = MODULE_IDENT "EOF reached.";
-      break;
-    case FILE_ERROR:
-      error_text = MODULE_IDENT "Unable to read/write file.";
-      break;
-    case FILE_INVALID_FORMAT:
-      error_text = MODULE_IDENT "File has invalid format.";
-      break;
-    case FILE_NO_FILENAME:
-      error_text = MODULE_IDENT "Blank filename provided.";
-      break;
-    case FILE_INTERNAL_ERROR:
-      error_text = MODULE_IDENT "Internal error, trying to recover.";
-      break;
-    case FILE_EMPTY_LIST:
-      error_text = MODULE_IDENT "Attempted to save empty list.";
-      break;
-    default:
-      error_text = MODULE_IDENT "This is really bad, you've invented an error I don't know!";
-      break;
+  switch (file_error) {
+  case FILE_NO_ERROR:
+    error_text = MODULE_IDENT "No error.";
+    break;
+  case FILE_EOF:
+    error_text = MODULE_IDENT "EOF reached.";
+    break;
+  case FILE_ERROR:
+    error_text = MODULE_IDENT "Unable to read/write file.";
+    break;
+  case FILE_INVALID_FORMAT:
+    error_text = MODULE_IDENT "File has invalid format.";
+    break;
+  case FILE_NO_FILENAME:
+    error_text = MODULE_IDENT "Blank filename provided.";
+    break;
+  case FILE_INTERNAL_ERROR:
+    error_text = MODULE_IDENT "Internal error, trying to recover.";
+    break;
+  case FILE_EMPTY_LIST:
+    error_text = MODULE_IDENT "Attempted to save empty list.";
+    break;
+  default:
+    error_text = MODULE_IDENT
+                 "This is really bad, you've invented an error I don't know!";
+    break;
   }
 
   return error_text;
@@ -270,7 +275,8 @@ char *errorString(enum FileError file_error) {
  *                 here.
  */
 static enum FileError readEventFromFile(struct Event **loaded_event,
-                                        struct CalendarFile *calendar_file) {
+                                        struct CalendarFile *calendar_file)
+{
   enum FileError file_error_result;
   char date[EVENT_MAX_DATE_STR_LEN], time[EVENT_MAX_TIME_STR_LEN];
   int duration, read_result;
@@ -345,7 +351,8 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
  *
  */
 static enum FileError readEventName(char **temp_name,
-                                    struct CalendarFile *calendar_file) {
+                                    struct CalendarFile *calendar_file)
+{
   enum FileError file_error_result;
   size_t name_string_length;
 
@@ -394,8 +401,9 @@ static enum FileError readEventName(char **temp_name,
  * calendar_file - Calendar file struct for holding our read buffer,
  *                 etc.
  */
-static enum FileError readEventLocation(char** temp_location,
-                                        struct CalendarFile *calendar_file) {
+static enum FileError readEventLocation(char **temp_location,
+                                        struct CalendarFile *calendar_file)
+{
   enum FileError file_error_result;
   size_t location_string_length;
 
@@ -432,7 +440,8 @@ static enum FileError readEventLocation(char** temp_location,
  * code so the caller knows to stop reading the file.
  */
 static enum FileError readVariableLengthString(struct CalendarFile
-    *calendar_file) {
+    *calendar_file)
+{
   enum FileError error_result;
   size_t length;
   int buffer_space_remaining;

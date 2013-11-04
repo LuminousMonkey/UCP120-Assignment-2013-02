@@ -2,6 +2,9 @@
  * UCP 120 Assignment
  *
  * Author: Mike Aldred
+ *
+ * Main file for the UCP assignment, just does simple command line
+ * parsing before setting up and running the GUI.
  */
 
 #include <stdio.h>
@@ -15,11 +18,13 @@
 
 #include "gui.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   struct AssignmentState state;
 
   state.event_list = eventListCreate();
   state.error = NULL;
+  state.error_code = 0;
 
   if (argc == 2) {
     /* Try loading the calendar file. */
@@ -38,4 +43,5 @@ int main(int argc, char *argv[]) {
   uiCleanup(&state);
   eventListDestroy(state.event_list);
 
+  return state.error_code;
 }

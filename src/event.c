@@ -14,9 +14,6 @@
 #include "bool.h"
 #include "event.h"
 
-#define MAX_LENGTH_OF_NAME 1024
-#define MAX_LENGTH_OF_LOCATION 1024
-
 /*
  * Forward declarations.
  */
@@ -39,7 +36,8 @@ enum EventError eventCreate(struct Event **new_event,
                             const char *const stTime,
                             int duration,
                             const char *const name,
-                            const char *const location) {
+                            const char *const location)
+{
   enum EventError error_result;
   error_result = EVENT_NO_ERROR;
 
@@ -97,7 +95,8 @@ enum EventError eventCreate(struct Event **new_event,
  * It's doubling up storage space, but it makes building up the string
  * for all the events a bit easier.
  */
-static int eventString(struct Event *const event, char **const outString) {
+static int eventString(struct Event *const event, char **const outString)
+{
   int string_length;
 
   char date_string[MAX_DATE_STRING];
@@ -150,7 +149,8 @@ static int eventString(struct Event *const event, char **const outString) {
   return string_length;
 }
 
-enum EventError eventSetName(const char *const name, char **event_name) {
+enum EventError eventSetName(const char *const name, char **event_name)
+{
   enum EventError result;
   size_t name_length;
 
@@ -178,7 +178,8 @@ enum EventError eventSetName(const char *const name, char **event_name) {
 }
 
 enum EventError eventSetLocation(const char *const location,
-                                 char **event_location) {
+                                 char **event_location)
+{
   enum EventError result;
   size_t location_length;
 
@@ -210,7 +211,8 @@ enum EventError eventSetLocation(const char *const location,
  * Frees up the whole event, including any allocated strings for name
  * and location.
  */
-void eventDestroy(struct Event *event) {
+void eventDestroy(struct Event *event)
+{
   if (event != NULL) {
     if (event->name != NULL) {
       free(event->name);
@@ -231,6 +233,7 @@ void eventDestroy(struct Event *event) {
 /*
  * Durations must be a non-negative integer.
  */
-static Boolean durationValid(int duration) {
+static Boolean durationValid(int duration)
+{
   return (duration >= 0);
 }

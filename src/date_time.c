@@ -48,7 +48,8 @@ static enum DateTimeError validateTime(int hour, int minutes);
  * It will return the error status, on any error, the Date struct is reset
  * to 0-0-0.
  */
-enum DateTimeError dateParse(const char *const stDate, struct Date *date) {
+enum DateTimeError dateParse(const char *const stDate, struct Date *date)
+{
   enum DateTimeError error_result;
   error_result = checkStrLength(stDate, DATETIME_MIN_DATE_STR_LEN,
                                 DATETIME_MAX_DATE_STR_LEN);
@@ -60,7 +61,8 @@ enum DateTimeError dateParse(const char *const stDate, struct Date *date) {
   return error_result;
 }
 
-enum DateTimeError timeParse(const char *const stTime, struct Time *time) {
+enum DateTimeError timeParse(const char *const stTime, struct Time *time)
+{
   enum DateTimeError error_result;
   error_result = checkStrLength(stTime, DATETIME_MIN_TIME_STR_LEN,
                                 DATETIME_MAX_TIME_STR_LEN);
@@ -72,7 +74,8 @@ enum DateTimeError timeParse(const char *const stTime, struct Time *time) {
   return error_result;
 }
 
-void dateString(char *const outString, const struct Date *const date) {
+void dateString(char *const outString, const struct Date *const date)
+{
   const char *const months[] = {"January", "February", "March", "April", "May", "June",
                                 "July", "August", "September", "October", "November",
                                 "December"
@@ -90,7 +93,8 @@ void dateString(char *const outString, const struct Date *const date) {
  *
  * Will just go with 00:00 = 12:00am and 12:00 = 12:00pm.
  */
-void timeString(char *const outString, const struct Time *const time) {
+void timeString(char *const outString, const struct Time *const time)
+{
   int hour_12;
   const char *meridies;
 
@@ -116,7 +120,8 @@ void timeString(char *const outString, const struct Time *const time) {
 /*
  * TODO: Find max possible string length and enforce it.
  */
-void durationString(char *const outString, int duration) {
+void durationString(char *const outString, int duration)
+{
   int hours, minutes;
   char *hour_description, *minute_description;
 
@@ -165,7 +170,8 @@ void durationString(char *const outString, int duration) {
  */
 static enum DateTimeError checkStrLength(const char *const stDate,
     const size_t min,
-    const size_t max) {
+    const size_t max)
+{
   enum DateTimeError error_result;
   size_t date_str_len;
 
@@ -189,7 +195,8 @@ static enum DateTimeError checkStrLength(const char *const stDate,
  * struct to 0-0-0.
  */
 static enum DateTimeError parseDateString(const char *const stDate,
-    struct Date *date) {
+    struct Date *date)
+{
   enum DateTimeError error_result;
   int day, month, year, scan_result;
 
@@ -219,7 +226,8 @@ static enum DateTimeError parseDateString(const char *const stDate,
  * The actual date validation.
  * Handle obvious bad dates, and if possible, invalid dates.
  */
-static enum DateTimeError validateDate(int year, int month, int day) {
+static enum DateTimeError validateDate(int year, int month, int day)
+{
   enum DateTimeError result;
 
   result = checkYear(year);
@@ -238,7 +246,8 @@ static enum DateTimeError validateDate(int year, int month, int day) {
 /*
  * Return true if the given year is a leap year.
  */
-static Boolean isLeapYear(int year) {
+static Boolean isLeapYear(int year)
+{
   Boolean result = FALSE;
 
   if (year % 400 == 0) {
@@ -257,7 +266,8 @@ static Boolean isLeapYear(int year) {
 /*
  * Negative years are invalid, BC not covered.
  */
-static enum DateTimeError checkYear(int year) {
+static enum DateTimeError checkYear(int year)
+{
   enum DateTimeError result;
   result = DATETIME_NO_ERROR;
 
@@ -271,7 +281,8 @@ static enum DateTimeError checkYear(int year) {
 /*
  * Check the month is valid.
  */
-static enum DateTimeError checkMonth(int month) {
+static enum DateTimeError checkMonth(int month)
+{
   enum DateTimeError result;
   result = DATETIME_NO_ERROR;
 
@@ -287,7 +298,8 @@ static enum DateTimeError checkMonth(int month) {
  *
  * It is assumed that month verification has been done.
  */
-static enum DateTimeError checkDay(int year, int month, int day) {
+static enum DateTimeError checkDay(int year, int month, int day)
+{
   /*
    * 30 days hath September...
    * February has 28, unless it's a leap year.
@@ -311,7 +323,8 @@ static enum DateTimeError checkDay(int year, int month, int day) {
 }
 
 static enum DateTimeError parseTimeString(const char *const stTime,
-    struct Time *time) {
+    struct Time *time)
+{
   enum DateTimeError error_result;
   int hour, minutes, scan_result;
 
@@ -335,7 +348,8 @@ static enum DateTimeError parseTimeString(const char *const stTime,
   return error_result;
 }
 
-static enum DateTimeError validateTime(int hour, int minutes) {
+static enum DateTimeError validateTime(int hour, int minutes)
+{
   enum DateTimeError result;
 
   result = DATETIME_NO_ERROR;

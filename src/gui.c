@@ -36,7 +36,8 @@ typedef struct {
  * of buttons on the left, and an area to display text on the right. You must
  * specify the window title.
  */
-Window *createWindow(char *title) {
+Window *createWindow(char *title)
+{
   Window *win;
   GtkWidget *pane, *scrollArea, *textView;
   static int init = FALSE;
@@ -94,7 +95,8 @@ Window *createWindow(char *title) {
  * erase whatever text is currently displayed, and copy your new text into the
  * window.
  */
-void setText(Window *window, char *newText) {
+void setText(Window *window, char *newText)
+{
   assert(window != NULL);
   assert(newText != NULL);
   gtk_text_buffer_set_text(GTK_TEXT_BUFFER(window->textBuffer), newText,
@@ -107,7 +109,8 @@ void setText(Window *window, char *newText) {
  * It's a go-between, between GTK and your assignment code, so that you don't
  * have to deal with GTK widgets directly.
  */
-static void buttonClicked(GtkWidget *widget, gpointer data) {
+static void buttonClicked(GtkWidget *widget, gpointer data)
+{
   Callback *callback = (Callback *)data;
 
   if (callback->function == NULL) {
@@ -121,7 +124,8 @@ static void buttonClicked(GtkWidget *widget, gpointer data) {
  * not visible outside this file. This is a callback for cleaning up after the
  * first callback -- buttonClicked -- defined above.
  */
-static void freeCallback(gpointer data, GClosure *closure) {
+static void freeCallback(gpointer data, GClosure *closure)
+{
   free(data);
 }
 
@@ -138,7 +142,8 @@ static void freeCallback(gpointer data, GClosure *closure) {
  *             variables.)
  */
 void addButton(Window *window, char *label, void (*callback)(void *),
-               void *data) {
+               void *data)
+{
   GtkWidget *button;
   Callback *callbackDetails;
 
@@ -167,7 +172,8 @@ void addButton(Window *window, char *label, void (*callback)(void *),
  * specified before will be called. The callback function itself must complete
  * the task the user wants to accomplish (using its data parameter).
  */
-void runGUI(Window *window) {
+void runGUI(Window *window)
+{
   assert(window != NULL);
   gtk_widget_show_all(GTK_WIDGET(window->gtkWindow));
   gtk_main();
@@ -177,7 +183,8 @@ void runGUI(Window *window) {
  * Frees a window. This should be done at the end of the program, once runGUI
  * has finished.
  */
-void freeWindow(Window *window) {
+void freeWindow(Window *window)
+{
   free(window);
 }
 
@@ -207,7 +214,8 @@ void freeWindow(Window *window) {
  * "Ok".
  */
 int dialogBox(Window *window, char *dialogTitle,
-              int nInputs, InputProperties *properties, char **inputs) {
+              int nInputs, InputProperties *properties, char **inputs)
+{
   int i, response;
   GtkWidget *dialog, *contentArea, **entries, *label;
 
@@ -306,7 +314,8 @@ int dialogBox(Window *window, char *dialogTitle,
 /**
  * Displays a simple message box window, with a message and a "Close" button.
  */
-void messageBox(Window *window, char *message) {
+void messageBox(Window *window, char *message)
+{
   GtkWidget *dialog;
 
   assert(window != NULL);

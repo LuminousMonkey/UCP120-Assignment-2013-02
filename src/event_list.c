@@ -13,7 +13,8 @@
 /*
  * Creates an empty list, returning a pointer to the list.
  */
-struct EventList *eventListCreate() {
+struct EventList *eventListCreate()
+{
   struct EventList *new_list;
 
   new_list = (struct EventList *) malloc(sizeof(struct EventList));
@@ -37,7 +38,8 @@ struct EventList *eventListCreate() {
  * It's up the the caller to set the list pointer to NULL (or to
  * create a new empty list).
  */
-void eventListDestroy(struct EventList *list) {
+void eventListDestroy(struct EventList *list)
+{
   struct EventListNode *current_node;
   struct EventListNode *next_node;
 
@@ -61,7 +63,8 @@ void eventListDestroy(struct EventList *list) {
  * Resets the list so the next call with "next" will return the first
  * event in the list.
  */
-void eventListResetPosition(struct EventList *list) {
+void eventListResetPosition(struct EventList *list)
+{
   list->current = list->head;
 }
 
@@ -71,7 +74,8 @@ void eventListResetPosition(struct EventList *list) {
  * Returns NULL if no more events.
  * Be sure to use event_list_reset_position first.
  */
-struct Event *eventListNext(struct EventList *list) {
+struct Event *eventListNext(struct EventList *list)
+{
   struct Event *result;
 
   result = NULL;
@@ -88,7 +92,8 @@ struct Event *eventListNext(struct EventList *list) {
  * Given a list, add the given event to that list.
  */
 Boolean eventListInsertLast(struct EventList *list,
-                            struct Event *to_insert) {
+                            struct Event *to_insert)
+{
   struct EventListNode *new_node;
   Boolean result;
 
@@ -128,7 +133,8 @@ Boolean eventListInsertLast(struct EventList *list,
  * It will allocate the memory, but it is expected that the caller
  * frees it using free().
  */
-char *eventListString(struct EventList *list) {
+char *eventListString(struct EventList *list)
+{
   int current_size, num_of_events;
   struct Event *current_event;
   char *result;
