@@ -63,6 +63,7 @@ static void uiLoadCalendar(void *in_data);
 static void uiSaveCalendar(void *in_data);
 static void uiAddEvent(void *in_data);
 static void uiEditEvent(void *in_data);
+static void uiDeleteEvent(void *in_data);
 
 /* Utility functions */
 static struct Event *uiFindEvent(struct AssignmentState *state);
@@ -90,7 +91,7 @@ void uiSetup(struct AssignmentState *state)
             (void *)state);
   addButton(state->main_window, ADD_BUTTON_LABEL, &uiAddEvent, (void *)state);
   addButton(state->main_window, EDIT_BUTTON_LABEL, &uiEditEvent, (void *)state);
-  /*   addButton(state->main_window, DELETE_BUTTON_LABEL, &uiDeleteEvent, (void *)state); */
+  addButton(state->main_window, DELETE_BUTTON_LABEL, &uiDeleteEvent, (void *)state);
   addButton(state->main_window, QUIT_BUTTON_LABEL, NULL, NULL);
 
   uiShowError(state);
@@ -337,6 +338,24 @@ static void uiEditEvent(void *in_data)
 
   /* Show any errors */
   uiShowError(state);
+}
+
+/*
+ * Prompt the user for an event name, and delete the event.
+ */
+static void uiDeleteEvent(void *in_data) {
+  struct AssignmentState *const state = (struct AssignmentState *)in_data;
+  struct Event *event_to_delete;
+
+  event_to_delete = uiFindEvent(state);
+
+  if (event_to_delete != NULL) {
+    if (!eventListDelete(state->event_list, event_to_delete)) {
+      state->error = "Found event, but couldn't delete it.";
+    }
+  } else {
+    state->error = "Could not find event to delete";
+  }
 }
 
 /*
