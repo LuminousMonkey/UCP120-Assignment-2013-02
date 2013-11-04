@@ -123,3 +123,4 @@ int dialogBox(Window *window, char *dialogTitle, int nInputs,
 void messageBox(Window *window, char *message);
 
 #endif
+

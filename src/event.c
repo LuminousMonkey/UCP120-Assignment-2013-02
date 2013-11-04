@@ -142,10 +142,12 @@ enum EventError eventEdit(struct Event *event_to_edit,
  */
 void eventDestroy(struct Event *event)
 {
-  free(event->name);
-  free(event->location);
-  free(event->formatted_string);
-  free(event);
+  if (event != NULL) {
+    free(event->name);
+    free(event->location);
+    free(event->formatted_string);
+    free(event);
+  }
 }
 
 /*

@@ -76,4 +76,12 @@ char *eventListString(struct EventList *list);
  */
 struct Event *eventListFind(struct EventList *list, char *search_string);
 
+/*
+ * Delete event.
+ *
+ * Given a pointer to an event, delete it from the list.
+ * Returns TRUE if the delete succeeded, FALSE otherwise.
+ */
+Boolean eventListDelete(struct EventList *list, struct Event *to_delete);
+
 #endif

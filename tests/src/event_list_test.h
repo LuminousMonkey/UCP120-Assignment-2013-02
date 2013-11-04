@@ -29,4 +29,7 @@ void testEventListFind();
 /* Should get nothing back from and empty list. */
 void testEventListFindEmptyList();
 
+/* Test the delete operation */
+void testEventListDelete();
+
 #endif

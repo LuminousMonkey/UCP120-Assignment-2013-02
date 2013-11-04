@@ -219,3 +219,58 @@ struct Event *eventListFind(struct EventList *list, char *search_string)
 
   return result;
 }
+
+Boolean eventListDelete(struct EventList *list, struct Event *to_delete) {
+  Boolean node_found;
+
+  struct EventListNode *previous_node;
+  struct EventListNode *next_node;
+  struct EventListNode *node_to_delete;
+
+  node_found = FALSE;
+
+  previous_node = NULL;
+
+  /* Start with the first node */
+  node_to_delete = list->head;
+
+  /* Step through the nodes of the list */
+  while (node_to_delete != NULL && !node_found) {
+    /*
+     * If this is the node we're going to remove, we need the pointer
+     * to the next node.
+     */
+    next_node = node_to_delete->next;
+
+    /* We have a match! */
+    if (node_to_delete->event == to_delete) {
+      /* If we had a previous node, link to the next node. */
+      if (previous_node != NULL) {
+        previous_node->next = next_node;
+      }
+
+      /* Are we deleting the head node? */
+      if (list->head == node_to_delete) {
+        /* Yep, so next node is the new head. */
+        list->head = next_node;
+      }
+
+      /* Deleting the tail node? */
+      if (list->tail == node_to_delete) {
+        /* Yep, make tail the previous node. */
+        list->tail = previous_node;
+      }
+
+      eventDestroy(node_to_delete->event);
+      free(node_to_delete);
+
+      node_found = TRUE;
+    } else {
+      /* Not the right one, keep looking. */
+      previous_node = node_to_delete;
+      node_to_delete = node_to_delete->next;
+    }
+  }
+
+  return node_found;
+}
