@@ -88,3 +88,39 @@ void testEventListInsertNull() {
   CU_ASSERT_PTR_NULL(test_list->head);
   CU_ASSERT_PTR_NULL(test_list->tail);
 }
+
+void testEventListFind() {
+  struct EventList *test_list;
+  struct Event *test_event_one, *test_event_two, *test_event_three,
+      *found_event;
+
+  test_list = eventListCreate();
+  CU_ASSERT_PTR_NOT_NULL(test_list);
+
+  eventCreate(&test_event_one, "2010-05-24", "06:15", 10, "Event 1", NULL);
+  eventCreate(&test_event_two, "2011-05-24", "06:15", 10, "Event 2", NULL);
+  eventCreate(&test_event_three, "2012-05-24", "06:15", 10, "Event 3", NULL);
+
+  CU_ASSERT_TRUE(eventListInsertLast(test_list, test_event_one));
+  CU_ASSERT_TRUE(eventListInsertLast(test_list, test_event_two));
+  CU_ASSERT_TRUE(eventListInsertLast(test_list, test_event_three));
+
+  found_event = eventListFind(test_list, "Event 1");
+
+  CU_ASSERT_PTR_NOT_NULL(found_event);
+  CU_ASSERT_PTR_EQUAL(found_event,test_event_one);
+
+  found_event = eventListFind(test_list, "Can not find me");
+  CU_ASSERT_PTR_NULL(found_event);
+}
+
+void testEventListFindEmptyList() {
+  struct EventList *test_list;
+  struct Event *found_event;
+
+  test_list = eventListCreate();
+  CU_ASSERT_PTR_NOT_NULL(test_list);
+
+  found_event = eventListFind(test_list, "sadfsa");
+  CU_ASSERT_PTR_NULL(found_event);
+}

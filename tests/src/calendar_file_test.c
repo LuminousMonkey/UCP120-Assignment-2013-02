@@ -4,7 +4,7 @@
  * Author: Mike Aldred
  */
 
-#include <CUnit/Cunit.h>
+#include <CUnit/CUnit.h>
 
 #include "calendar_file_test.h"
 #include "calendar_file.h"

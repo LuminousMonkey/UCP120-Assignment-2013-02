@@ -1,6 +1,6 @@
 PROG := ucp-assignment
 LIBS := $(shell pkg-config --libs gtk+-2.0)
-CFLAGS := -MMD -pedantic -Wall -Wextra $(shell pkg-config --cflags gtk+-2.0)
+CFLAGS := -O0 -MMD -pedantic -Wall -Wextra $(shell pkg-config --cflags gtk+-2.0)
 DBFLAGS := -g
 
 # Should not have to change anything below here.
@@ -15,8 +15,8 @@ DEPFILES := $(patsubst src/%.c,obj/%.d,$(SRCFILES))
 
 # Unit Testing
 # Make sure it can find the CUnit includes and library
-UTCFLAGS := -g
-UTLIBS := $(shell pkg-config --cflags --libs cunit)
+UTCFLAGS := -O0 -g -MMD -pedantic -Wall -Wextra $(shell pkg-config --cflags cunit)
+UTLIBS := $(shell pkg-config --libs cunit)
 UTOUTDIRS := tests
 
 UTSRCFILES := $(wildcard tests/src/*.c)
@@ -37,7 +37,7 @@ tests/unittests: $(UTOBJFILES)
 	$(CC) $(STD) $(UTCFLAGS) -o $@ $^ $(UTLIBS)
 
 tests/obj/%.o: tests/src/%.c
-	$(CC) $(DBFLAGS) $(STD) $(CFLAGS) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
+	$(CC) $(STD) $(UTCFLAGS) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
 
 $(PROG): $(OBJFILES)
 ifeq ($(DEBUG),0)

@@ -11,6 +11,11 @@
 #include "event_list.h"
 
 /*
+ * String that is put at the end of the events in the calendar text.
+ */
+#define EVENT_END_TERMINATOR "\n---"
+
+/*
  * Creates an empty list, returning a pointer to the list.
  */
 struct EventList *eventListCreate()
@@ -135,13 +140,13 @@ Boolean eventListInsertLast(struct EventList *list,
  */
 char *eventListString(struct EventList *list)
 {
-  int current_size, num_of_events;
-  struct Event *current_event;
   char *result;
-
   result = NULL;
 
   if (list->head != NULL) {
+    int current_size, num_of_events;
+    struct Event *current_event;
+
     current_size = 0;
     num_of_events = 0;
 
@@ -175,13 +180,39 @@ char *eventListString(struct EventList *list)
                 current_event->formatted_string_length);
 
         if (list->current != NULL) {
-          strcat(result, "\n---\n\n");
+          strcat(result, EVENT_END_TERMINATOR "\n\n");
         } else {
-          strcat(result, "\n---");
+          strcat(result, EVENT_END_TERMINATOR);
         }
 
         current_event = eventListNext(list);
       }
+    }
+  }
+
+  return result;
+}
+
+/*
+ * Search for event.
+ */
+struct Event *eventListFind(struct EventList *list, char *search_string) {
+  struct Event *result;
+  Boolean not_found;
+
+  eventListResetPosition(list);
+  result = eventListNext(list);
+
+  not_found = TRUE;
+
+  /*
+   * Loop through the list, looking at each event for a match.
+   */
+  while (result != NULL && not_found) {
+    if (strcmp(search_string, result->name) == 0) {
+      not_found = FALSE;
+    } else {
+      result = eventListNext(list);
     }
   }
 

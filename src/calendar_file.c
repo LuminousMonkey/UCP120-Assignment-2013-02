@@ -92,8 +92,10 @@ enum FileError loadCalendar(struct EventList *list,
     if (calendar_file.current_file != NULL) {
       /* Manged to open the file. */
       struct Event *current_event;
+      Boolean event_insert_success;
+
       current_event = NULL;
-      Boolean event_insert_success = FALSE;
+      event_insert_success = FALSE;
 
       /*
        * Allocate our starting buffer for reading variable length

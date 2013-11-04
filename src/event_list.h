@@ -28,12 +28,28 @@ struct EventList {
   struct EventListNode *current;
 };
 
+/*
+ * Create a new event list and return a pointer to it.
+ */
 struct EventList *eventListCreate();
+
+/*
+ * Destroy the given list.
+ *
+ * Will clean up all the events, and free all the memory.
+ */
 void eventListDestroy(struct EventList *list);
 
+/*
+ * Insert the given event into the end of the list.
+ */
 Boolean eventListInsertLast(struct EventList *list,
                             struct Event *to_insert);
 
+/*
+ * Reset the internal iterator, so that eventListNext will return the
+ * first event in the list.
+ */
 void eventListResetPosition(struct EventList *list);
 
 /*
@@ -43,6 +59,21 @@ void eventListResetPosition(struct EventList *list);
  */
 struct Event *eventListNext(struct EventList *list);
 
+/*
+ * Returns the event formatted as specified in the assignment spec.
+ */
 char *eventListString(struct EventList *list);
+
+/*
+ * Search for event.
+ *
+ * Given a string, search for the given event name that matches that
+ * string and return a pointer for that event.
+ *
+ * Returns NULL is the event wasn't found.
+ *
+ * Name must match exactly.
+ */
+struct Event *eventListFind(struct EventList *list, char *search_string);
 
 #endif

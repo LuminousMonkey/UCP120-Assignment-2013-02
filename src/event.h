@@ -74,4 +74,7 @@ enum EventError eventCreate(struct Event **new_event,
 
 void eventDestroy(struct Event *event);
 
+enum EventError eventSetName(const char *const name, char **event_name);
+enum EventError eventSetLocation(const char *const name, char **event_name);
+
 #endif

@@ -72,8 +72,12 @@ int main() {
                            testEventListInsertSingle)) ||
       (NULL == CU_add_test(pEventListSuite, "Test Event List Insert Null",
                            testEventListInsertNull)) ||
-      (NULL == CU_add_test(pEventListSuite, "Test Even List Insert Multiple",
+      (NULL == CU_add_test(pEventListSuite, "Test Event List Insert Multiple",
                            testEventListInsertMultiple)) ||
+      (NULL == CU_add_test(pEventListSuite, "Test Event Find",
+                           testEventListFind)) ||
+      (NULL == CU_add_test(pEventListSuite, "Test Event Find Empty List",
+                           testEventListFindEmptyList)) ||
       (NULL == CU_add_test(pCalendarFileSuite, "Test Load Calendar File",
                            testCalendarLoadFile)) ||
       (NULL == CU_add_test(pCalendarFileSuite, "Test Load Invalid Calendar Files",

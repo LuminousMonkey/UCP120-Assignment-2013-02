@@ -23,4 +23,10 @@ void testEventListInsertMultiple();
 /* List should not add NULLs */
 void testEventListInsertNull();
 
+/* Search that we can search events. */
+void testEventListFind();
+
+/* Should get nothing back from and empty list. */
+void testEventListFindEmptyList();
+
 #endif
