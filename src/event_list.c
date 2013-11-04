@@ -196,7 +196,8 @@ char *eventListString(struct EventList *list)
 /*
  * Search for event.
  */
-struct Event *eventListFind(struct EventList *list, char *search_string) {
+struct Event *eventListFind(struct EventList *list, char *search_string)
+{
   struct Event *result;
   Boolean not_found;
 

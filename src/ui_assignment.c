@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "assignment_state.h"
@@ -35,11 +36,11 @@
 #define FIND_EVENT "Find Event"
 
 #define EDIT_PROPERTIES(var_name) InputProperties var_name[] = {  \
-    {"Event Name", MAX_LENGTH_OF_NAME, FALSE},                          \
-    {"Location", MAX_LENGTH_OF_LOCATION, FALSE},                        \
-    {"Date (YYYY-MM-DD)", MAX_DATE_STRING, FALSE},                      \
-    {"Time", MAX_TIME_STRING, FALSE},                                   \
-    {"Duration", MAX_DURATION_STRING, FALSE}}
+                                                                  {"Event Name", MAX_LENGTH_OF_NAME, FALSE},                          \
+                                                                  {"Location", MAX_LENGTH_OF_LOCATION, FALSE},                        \
+                                                                  {"Date (YYYY-MM-DD)", MAX_DATE_STRING, FALSE},                      \
+                                                                  {"Time", MAX_TIME_STRING, FALSE},                                   \
+                                                                  {"Duration", MAX_DURATION_STRING, FALSE}}
 
 /*
  * The index of the strings to be edited passed in via
@@ -60,7 +61,7 @@ static void uiLoadCalendar(void *in_data);
 static void uiSaveCalendar(void *in_data);
 static void uiAddEvent(void *in_data);
 static void uiEditEvent(void *in_data);
-static struct Event* uiFindEvent(struct AssignmentState *state);
+static struct Event *uiFindEvent(struct AssignmentState *state);
 static void uiShowError(struct AssignmentState *state);
 static void uiSetCalendarText(struct AssignmentState *state);
 static void uiClearCalendarText(struct AssignmentState *state);
@@ -85,7 +86,7 @@ void uiSetup(struct AssignmentState *state)
             (void *)state);
   addButton(state->main_window, ADD_BUTTON_LABEL, &uiAddEvent, (void *)state);
   addButton(state->main_window, EDIT_BUTTON_LABEL, &uiEditEvent, (void *)state);
-     /*   addButton(state->main_window, DELETE_BUTTON_LABEL, &uiDeleteEvent, (void *)state); */
+  /*   addButton(state->main_window, DELETE_BUTTON_LABEL, &uiDeleteEvent, (void *)state); */
   addButton(state->main_window, QUIT_BUTTON_LABEL, NULL, NULL);
 
   uiShowError(state);
@@ -244,7 +245,8 @@ static void uiAddEvent(void *in_data)
  *
  * Searches for that event, if found, pops up an edit window.
  */
-static void uiEditEvent(void *in_data) {
+static void uiEditEvent(void *in_data)
+{
   struct AssignmentState *const state = (struct AssignmentState *)in_data;
   struct Event *event_to_edit;
   EDIT_PROPERTIES(dialog_properties);
@@ -268,11 +270,14 @@ static void uiEditEvent(void *in_data) {
       /* Copy the found event strings over to the edit box */
       strncat(name, event_to_edit->name, MAX_LENGTH_OF_NAME);
       strncat(location, event_to_edit->location, MAX_LENGTH_OF_LOCATION);
-      sprintf(date, "%04d-%02d-%02d", event_to_edit->date.year,
-              event_to_edit->date.month,
-              event_to_edit->date.day );
 
-      sprintf(time, "%02d:%02d", event_to_edit->time.hour,
+      sprintf(date, "%04d-%02d-%02d",
+              event_to_edit->date.year,
+              event_to_edit->date.month,
+              event_to_edit->date.day);
+
+      sprintf(time, "%02d:%02d",
+              event_to_edit->time.hour,
               event_to_edit->time.minutes);
 
       sprintf(duration, "%d", event_to_edit->duration);
@@ -283,26 +288,17 @@ static void uiEditEvent(void *in_data) {
       dialog_inputs[TIME_INDEX] = time;
       dialog_inputs[DURATION_INDEX] = duration;
 
-      if (TRUE == dialogBox(state->main_window, ADD_EVENT_TITLE, EDIT_PROPERTIES_SIZE,
-                            (InputProperties *)&dialog_properties, dialog_inputs)) {
-
-        /* Try creating a new event. */
+      if (TRUE == dialogBox(state->main_window, ADD_EVENT_TITLE,
+                            EDIT_PROPERTIES_SIZE,
+                            (InputProperties *)&dialog_properties,
+                            dialog_inputs)) {
         enum EventError error_result;
-        struct Event *new_event;
 
-        error_result = eventCreate(&new_event, date, time, atoi(duration),
-                                   name, location);
+        error_result = eventEdit(event_to_edit, date, time, atoi(duration),
+                                 name, location);
 
         if (error_result == EVENT_NO_ERROR) {
-            /* No error, update the fields */
-            free(event_to_edit->name);
-            eventSetName(name, &(event_to_edit->name));
-            free(event_to_edit->location);
-            eventSetLocation(name, &(event_to_edit->location));
-
-            free(new_event);
-
-            uiSetCalendarText(state);
+          uiSetCalendarText(state);
         } else {
           /* Error creating the event. */
           state->error = "Error editing event, invalid fields?";
@@ -327,7 +323,8 @@ static void uiEditEvent(void *in_data) {
  *
  * Returns a pointer to the event, NULL if no event was found.
  */
-static struct Event* uiFindEvent(struct AssignmentState *state) {
+static struct Event *uiFindEvent(struct AssignmentState *state)
+{
   InputProperties dialog_properties;
   struct Event *result;
   char **dialog_inputs;

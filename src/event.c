@@ -19,9 +19,9 @@
  */
 static int eventString(struct Event *const event, char **const outString);
 static Boolean durationValid(int duration);
-enum EventError eventSetName(const char *const name, char **event_name);
-enum EventError eventSetLocation(const char *const name,
-                                 char **location);
+static enum EventError eventSetName(const char *const name, char **event_name);
+static enum EventError eventSetLocation(const char *const name,
+                                        char **location);
 void eventDestroy(struct Event *event);
 
 /*
@@ -82,6 +82,70 @@ enum EventError eventCreate(struct Event **new_event,
   }
 
   return error_result;
+}
+
+/*
+ * Edit the given event.
+ */
+enum EventError eventEdit(struct Event *event_to_edit,
+                          const char *const stDate,
+                          const char *const stTime,
+                          const int duration,
+                          const char *const name,
+                          const char *const location)
+{
+  enum EventError error_result;
+  struct Event *temp_event;
+
+  /* Temp event
+   *
+   * We create this event, and if it's successful, we copy the values
+   * across to the event that's been passed in.
+  */
+
+  error_result = eventCreate(&temp_event, stDate, stTime, duration, name,
+                             location);
+
+  if (error_result == EVENT_NO_ERROR) {
+    /*
+     * The data passed in must be good. Copy it across. Have to first
+     * free the strings that the old version of the event has.
+     */
+    free(event_to_edit->name);
+    free(event_to_edit->location);
+    free(event_to_edit->formatted_string);
+
+    eventSetName(temp_event->name, &(event_to_edit->name));
+    eventSetLocation(temp_event->location, &(event_to_edit->location));
+    event_to_edit->date = temp_event->date;
+    event_to_edit->time = temp_event->time;
+
+    /*
+     * Copying the string from the temp event would be faster, but
+     * want to make sure mistake here show up quickly in the
+     * textbox.
+     */
+    eventString(event_to_edit, &(event_to_edit->formatted_string));
+    event_to_edit->formatted_string_length =
+      strlen(event_to_edit->formatted_string);
+  }
+  eventDestroy(temp_event);
+
+  return error_result;
+}
+
+/*
+ * Destroys an event.
+ *
+ * Frees up the whole event, including any allocated strings for name
+ * and location.
+ */
+void eventDestroy(struct Event *event)
+{
+  free(event->name);
+  free(event->location);
+  free(event->formatted_string);
+  free(event);
 }
 
 /*
@@ -149,7 +213,7 @@ static int eventString(struct Event *const event, char **const outString)
   return string_length;
 }
 
-enum EventError eventSetName(const char *const name, char **event_name)
+static enum EventError eventSetName(const char *const name, char **event_name)
 {
   enum EventError result;
   size_t name_length;
@@ -177,8 +241,8 @@ enum EventError eventSetName(const char *const name, char **event_name)
   return result;
 }
 
-enum EventError eventSetLocation(const char *const location,
-                                 char **event_location)
+static enum EventError eventSetLocation(const char *const location,
+                                        char **event_location)
 {
   enum EventError result;
   size_t location_length;
@@ -203,31 +267,6 @@ enum EventError eventSetLocation(const char *const location,
   }
 
   return result;
-}
-
-/*
- * Destroys an event.
- *
- * Frees up the whole event, including any allocated strings for name
- * and location.
- */
-void eventDestroy(struct Event *event)
-{
-  if (event != NULL) {
-    if (event->name != NULL) {
-      free(event->name);
-    }
-
-    if (event->location != NULL) {
-      free(event->location);
-    }
-
-    if (event->formatted_string != NULL) {
-      free(event->formatted_string);
-    }
-
-    free(event);
-  }
 }
 
 /*

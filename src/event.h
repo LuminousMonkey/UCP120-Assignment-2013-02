@@ -72,9 +72,13 @@ enum EventError eventCreate(struct Event **new_event,
                             const char *const name,
                             const char *const location);
 
-void eventDestroy(struct Event *event);
+enum EventError eventEdit(struct Event *event_to_edit,
+                          const char *const stDate,
+                          const char *const stTime,
+                          const int duration,
+                          const char *const name,
+                          const char *const location);
 
-enum EventError eventSetName(const char *const name, char **event_name);
-enum EventError eventSetLocation(const char *const name, char **event_name);
+void eventDestroy(struct Event *event);
 
 #endif
