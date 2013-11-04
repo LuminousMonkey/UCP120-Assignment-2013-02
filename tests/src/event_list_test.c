@@ -160,4 +160,14 @@ void testEventListDelete() {
 
   /* Searching for it in the list, should not fail. */
   CU_ASSERT_PTR_NULL(eventListFind(test_list, "Event 4"));
+
+  /* Delete the remaining one */
+  CU_ASSERT_TRUE(eventListDelete(test_list, test_event_two));
+
+  /* Searching for it in the list, should not fail. */
+  CU_ASSERT_PTR_NULL(eventListFind(test_list, "Event 2"));
+
+  CU_ASSERT_PTR_NULL(test_list->head);
+  CU_ASSERT_PTR_NULL(test_list->tail);
+
 }
