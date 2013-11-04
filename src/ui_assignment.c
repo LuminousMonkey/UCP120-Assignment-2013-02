@@ -352,10 +352,16 @@ static void uiDeleteEvent(void *in_data) {
   if (event_to_delete != NULL) {
     if (!eventListDelete(state->event_list, event_to_delete)) {
       state->error = "Found event, but couldn't delete it.";
+    } else {
+      /* Delete worked, update the calendar display. */
+      uiSetCalendarText(state);
     }
   } else {
     state->error = "Could not find event to delete";
   }
+
+  /* Show any errors */
+  uiShowError(state);
 }
 
 /*
