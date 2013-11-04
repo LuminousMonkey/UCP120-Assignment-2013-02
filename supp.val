@@ -1,0 +1,71 @@
+{
+   name
+   Memcheck:Cond
+   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
+}
+
+{
+   name
+   Memcheck:Free
+   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
+}
+
+{
+   name
+   Memcheck:Value8
+   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/i386-linux-gnu/libpango-1.0.so.0.3200.5
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/i386-linux-gnu/libgobject-2.0.so.0.3800.1
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/i386-linux-gnu/gtk-2.0/2.10.0/engines/libmurrine.so
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/i386-linux-gnu/libgio-2.0.so.0.3800.1
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/lib/i386-linux-gnu/libglib-2.0.so.0.3800.1
+   ...
+}
