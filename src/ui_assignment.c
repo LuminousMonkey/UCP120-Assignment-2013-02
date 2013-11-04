@@ -55,12 +55,16 @@
 #define EDIT_PROPERTIES_SIZE 5
 
 /*
- * Forward declarations
+ * Forward declarations.
  */
+
+/* The UI button callbacks */
 static void uiLoadCalendar(void *in_data);
 static void uiSaveCalendar(void *in_data);
 static void uiAddEvent(void *in_data);
 static void uiEditEvent(void *in_data);
+
+/* Utility functions */
 static struct Event *uiFindEvent(struct AssignmentState *state);
 static void uiShowError(struct AssignmentState *state);
 static void uiSetCalendarText(struct AssignmentState *state);
@@ -92,6 +96,23 @@ void uiSetup(struct AssignmentState *state)
   uiShowError(state);
 }
 
+/*
+ * UI Run
+ *
+ * Like UI Cleanup, this is just a simple wrapper. This just gets rid
+ * of a tiny bit of coupling between the main assignment function and
+ * the GUI lib provided by Dave.
+ */
+void uiRun(const struct AssignmentState *const state)
+{
+  runGUI(state->main_window);
+}
+
+/*
+ * UI Cleanup.
+ *
+ * Performs whatever is needed to clean up the GUI before we quit.
+ */
 void uiCleanup(struct AssignmentState *state)
 {
   freeWindow(state->main_window);
