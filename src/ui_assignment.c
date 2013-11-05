@@ -55,23 +55,6 @@
 #define EDIT_PROPERTIES_SIZE 5
 
 /*
- * Forward declarations.
- */
-
-/* The UI button callbacks */
-static void uiLoadCalendar(void *in_data);
-static void uiSaveCalendar(void *in_data);
-static void uiAddEvent(void *in_data);
-static void uiEditEvent(void *in_data);
-static void uiDeleteEvent(void *in_data);
-
-/* Utility functions */
-static struct Event *uiFindEvent(struct AssignmentState *state);
-static void uiShowError(struct AssignmentState *state);
-static void uiSetCalendarText(struct AssignmentState *state);
-static void uiClearCalendarText(struct AssignmentState *state);
-
-/*
  * This struct is used to hold the event details for the dialog box
  * editing. Because both Add, and Edit events have a few bits of
  * common code, this struct will hold the variables we need so we can
@@ -90,6 +73,24 @@ struct DialogEventFields {
   char *time;
   char *duration;
 };
+
+/*
+ * Forward declarations.
+ */
+
+/* The UI button callbacks */
+static void uiLoadCalendar(void *in_data);
+static void uiSaveCalendar(void *in_data);
+static void uiAddEvent(void *in_data);
+static void uiEditEvent(void *in_data);
+static void uiDeleteEvent(void *in_data);
+
+/* Utility functions */
+static struct Event *uiFindEvent(struct AssignmentState *state);
+static void uiShowError(struct AssignmentState *state);
+static void uiSetCalendarText(struct AssignmentState *state);
+static void uiClearCalendarText(struct AssignmentState *state);
+static void createEventDialogFieldStrings(struct DialogEventFields *fields);
 
 /*
  * UI Setup.
@@ -224,12 +225,7 @@ static void uiAddEvent(void *in_data)
   EDIT_PROPERTIES(dialog_properties);
 
   struct DialogEventFields dialog_fields;
-
-  dialog_fields.name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
-  dialog_fields.location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
-  dialog_fields.date = (char *)calloc(1, MAX_DATE_STRING + 1);
-  dialog_fields.time = (char *)calloc(1, MAX_TIME_STRING + 1);
-  dialog_fields.duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
+  createEventDialogFieldStrings(&dialog_fields);
 
   if (dialog_fields.name != NULL &&
       dialog_fields.location != NULL &&
@@ -453,4 +449,16 @@ static void uiSetCalendarText(struct AssignmentState *state)
 static void uiClearCalendarText(struct AssignmentState *state)
 {
   setText(state->main_window, "");
+}
+
+/*
+ * Allocate the memory for the strings for the add/edit event dialog
+ * box.
+ */
+static void createEventDialogFieldStrings(struct DialogEventFields *fields) {
+  fields->name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
+  fields->location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
+  fields->date = (char *)calloc(1, MAX_DATE_STRING + 1);
+  fields->time = (char *)calloc(1, MAX_TIME_STRING + 1);
+  fields->duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
 }
