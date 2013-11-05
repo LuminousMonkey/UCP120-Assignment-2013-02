@@ -119,6 +119,7 @@ enum EventError eventEdit(struct Event *event_to_edit,
     eventSetLocation(temp_event->location, &(event_to_edit->location));
     event_to_edit->date = temp_event->date;
     event_to_edit->time = temp_event->time;
+    event_to_edit->duration = temp_event->duration;
 
     /*
      * Copying the string from the temp event would be faster, but
