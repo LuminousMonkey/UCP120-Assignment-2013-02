@@ -34,7 +34,7 @@
  */
 #define EVENT_MAX_DATE_STR_LEN 11
 #define EVENT_MAX_TIME_STR_LEN 6
-#define EVENT_MAX_DURATION_STR_LEN "4"
+#define EVENT_MAX_DURATION_STR_LEN "10"
 
 /*
  * The C compiler will concat strings placed together.
