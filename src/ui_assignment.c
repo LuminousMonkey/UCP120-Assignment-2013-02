@@ -72,6 +72,26 @@ static void uiSetCalendarText(struct AssignmentState *state);
 static void uiClearCalendarText(struct AssignmentState *state);
 
 /*
+ * This struct is used to hold the event details for the dialog box
+ * editing. Because both Add, and Edit events have a few bits of
+ * common code, this struct will hold the variables we need so we can
+ * generalise the functions a bit more.
+ *
+ * name - Pointer to string for the name in the dialog.
+ * location - Pointer to string for the location.
+ * date - Pointer to string for the date.
+ * time - Pointer to string for the time.
+ * duration - Pointer to string for the duration.
+ */
+struct DialogEventFields {
+  char *name;
+  char *location;
+  char *date;
+  char *time;
+  char *duration;
+};
+
+/*
  * UI Setup.
  *
  * Takes a pointer to the AssignmentState struct. This struct is
@@ -203,27 +223,27 @@ static void uiAddEvent(void *in_data)
   struct AssignmentState *const state = (struct AssignmentState *)in_data;
   EDIT_PROPERTIES(dialog_properties);
 
-  char *name, *location, *date, *time, *duration;
+  struct DialogEventFields dialog_fields;
 
-  name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
-  location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
-  date = (char *)calloc(1, MAX_DATE_STRING + 1);
-  time = (char *)calloc(1, MAX_TIME_STRING + 1);
-  duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
+  dialog_fields.name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
+  dialog_fields.location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
+  dialog_fields.date = (char *)calloc(1, MAX_DATE_STRING + 1);
+  dialog_fields.time = (char *)calloc(1, MAX_TIME_STRING + 1);
+  dialog_fields.duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
 
-  if (name != NULL &&
-      location != NULL &&
-      date != NULL &&
-      time != NULL &&
-      duration != NULL) {
+  if (dialog_fields.name != NULL &&
+      dialog_fields.location != NULL &&
+      dialog_fields.date != NULL &&
+      dialog_fields.time != NULL &&
+      dialog_fields.duration != NULL) {
 
     char *dialog_inputs[EDIT_PROPERTIES_SIZE];
 
-    dialog_inputs[NAME_INDEX] = name;
-    dialog_inputs[LOCATION_INDEX] = location;
-    dialog_inputs[DATE_INDEX] = date;
-    dialog_inputs[TIME_INDEX] = time;
-    dialog_inputs[DURATION_INDEX] = duration;
+    dialog_inputs[NAME_INDEX] = dialog_fields.name;
+    dialog_inputs[LOCATION_INDEX] = dialog_fields.location;
+    dialog_inputs[DATE_INDEX] = dialog_fields.date;
+    dialog_inputs[TIME_INDEX] = dialog_fields.time;
+    dialog_inputs[DURATION_INDEX] = dialog_fields.duration;
 
     if (TRUE == dialogBox(state->main_window, ADD_EVENT_TITLE, EDIT_PROPERTIES_SIZE,
                           (InputProperties *)&dialog_properties, dialog_inputs)) {
@@ -231,8 +251,11 @@ static void uiAddEvent(void *in_data)
       enum EventError error_result;
       struct Event *new_event;
 
-      error_result = eventCreate(&new_event, date, time, atoi(duration),
-                                 name, location);
+      error_result = eventCreate(&new_event, dialog_fields.date,
+                                 dialog_fields.time,
+                                 atoi(dialog_fields.duration),
+                                 dialog_fields.name,
+                                 dialog_fields.location);
 
       if (error_result == EVENT_NO_ERROR) {
         if (eventListInsertLast(state->event_list, new_event)) {
@@ -252,11 +275,11 @@ static void uiAddEvent(void *in_data)
   }
 
   /* Clean up anything we might have allocated. */
-  free(name);
-  free(location);
-  free(date);
-  free(time);
-  free(duration);
+  free(dialog_fields.name);
+  free(dialog_fields.location);
+  free(dialog_fields.date);
+  free(dialog_fields.time);
+  free(dialog_fields.duration);
 
   /* Show any errors */
   uiShowError(state);
