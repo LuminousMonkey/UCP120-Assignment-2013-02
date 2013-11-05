@@ -70,6 +70,6 @@ enum FileError saveCalendar(struct EventList *list,
  * Given a file error, return a string that at least describes the
  * error a little bit.
  */
-char *errorString(enum FileError file_error);
+char *calendarErrorString(enum FileError file_error);
 
 #endif

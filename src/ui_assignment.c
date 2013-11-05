@@ -90,7 +90,13 @@ static struct Event *uiFindEvent(struct AssignmentState *state);
 static void uiShowError(struct AssignmentState *state);
 static void uiSetCalendarText(struct AssignmentState *state);
 static void uiClearCalendarText(struct AssignmentState *state);
+
+/* Functions for the add/edit dialogs */
 static void createEventDialogFieldStrings(struct DialogEventFields *fields);
+static void destroyEventDialogFieldStrings(struct DialogEventFields *fields);
+static void mapEventDialogFieldStringsToInputs(char *inputs[],
+                                               struct DialogEventFields *fields);
+
 
 /*
  * UI Setup.
@@ -234,12 +240,7 @@ static void uiAddEvent(void *in_data)
       dialog_fields.duration != NULL) {
 
     char *dialog_inputs[EDIT_PROPERTIES_SIZE];
-
-    dialog_inputs[NAME_INDEX] = dialog_fields.name;
-    dialog_inputs[LOCATION_INDEX] = dialog_fields.location;
-    dialog_inputs[DATE_INDEX] = dialog_fields.date;
-    dialog_inputs[TIME_INDEX] = dialog_fields.time;
-    dialog_inputs[DURATION_INDEX] = dialog_fields.duration;
+    mapEventDialogFieldStringsToInputs(dialog_inputs, &dialog_fields);
 
     if (TRUE == dialogBox(state->main_window, ADD_EVENT_TITLE, EDIT_PROPERTIES_SIZE,
                           (InputProperties *)&dialog_properties, dialog_inputs)) {
@@ -270,12 +271,7 @@ static void uiAddEvent(void *in_data)
     }
   }
 
-  /* Clean up anything we might have allocated. */
-  free(dialog_fields.name);
-  free(dialog_fields.location);
-  free(dialog_fields.date);
-  free(dialog_fields.time);
-  free(dialog_fields.duration);
+  destroyEventDialogFieldStrings(&dialog_fields);
 
   /* Show any errors */
   uiShowError(state);
@@ -456,9 +452,41 @@ static void uiClearCalendarText(struct AssignmentState *state)
  * box.
  */
 static void createEventDialogFieldStrings(struct DialogEventFields *fields) {
+  assert(fields != NULL);
   fields->name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
   fields->location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
   fields->date = (char *)calloc(1, MAX_DATE_STRING + 1);
   fields->time = (char *)calloc(1, MAX_TIME_STRING + 1);
   fields->duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
+}
+
+/*
+ * Map the dialog field strings to the dialog_inputs array that we
+ * need to pass into the dialogBox function.
+ *
+ * inputs - Pointer to the array that has to be populated with the
+ *          string pointers.
+ * fields - The DialogEventFields struct that holds the strings for
+ *           the event.
+ */
+static void mapEventDialogFieldStringsToInputs(char *inputs[],
+                                               struct DialogEventFields *fields) {
+  inputs[NAME_INDEX] = fields->name;
+  inputs[LOCATION_INDEX] = fields->location;
+  inputs[DATE_INDEX] = fields->date;
+  inputs[TIME_INDEX] = fields->time;
+  inputs[DURATION_INDEX] = fields->duration;
+
+}
+
+/*
+ * Free the memory for the strings for the add/edit event dialog box.
+ */
+static void destroyEventDialogFieldStrings(struct DialogEventFields *fields) {
+  assert(fields != NULL);
+  free(fields->name);
+  free(fields->location);
+  free(fields->date);
+  free(fields->time);
+  free(fields->duration);
 }
