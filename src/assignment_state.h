@@ -27,6 +27,11 @@
  * The error string gets checked, and it just pops up that string in a
  * message box. The pointer will then get cleared, so this means we
  * cannot use dynamically allocated strings.
+ *
+ * main_window - Pointer for the main window.
+ * event_list - Pointer to the list of calendar events that are loaded.
+ * error - String of the error that needs to be displayed to the user.
+ * error_code - Error code to return on the exit of the program.
  */
 struct AssignmentState {
   Window *main_window;

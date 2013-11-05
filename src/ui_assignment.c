@@ -154,7 +154,7 @@ static void uiLoadCalendar(void *in_data)
        */
       eventListDestroy(state->event_list);
       state->event_list = eventListCreate();
-      state->error = errorString(file_error);
+      state->error = calendarErrorString(file_error);
       uiClearCalendarText(state);
       uiShowError(state);
     }
@@ -192,7 +192,7 @@ static void uiSaveCalendar(void *in_data)
     free(file_name);
 
     if (file_error != FILE_NO_ERROR) {
-      state->error = errorString(file_error);
+      state->error = calendarErrorString(file_error);
       uiShowError(state);
     }
   }
@@ -288,6 +288,7 @@ static void uiEditEvent(void *in_data)
         date != NULL &&
         time != NULL &&
         duration != NULL) {
+
       char *dialog_inputs[EDIT_PROPERTIES_SIZE];
       /* Copy the found event strings over to the edit box */
       strncat(name, event_to_edit->name, MAX_LENGTH_OF_NAME);

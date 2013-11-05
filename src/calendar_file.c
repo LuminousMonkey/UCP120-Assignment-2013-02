@@ -27,10 +27,21 @@
  *
  * EVENT_LEADING_FORMAT is the fscanf string for reading in these
  * strings, these should be one less than the max string lengths.
+ *
+ * EVENT_MAX_DURATION_STR_LEN is only used for reading from the file,
+ * since duration is stored as an int. It's defined as a string
+ * because it's only used with EVENT_LEADING_FORMAT below.
  */
 #define EVENT_MAX_DATE_STR_LEN 11
 #define EVENT_MAX_TIME_STR_LEN 6
-#define EVENT_LEADING_FORMAT "%10s %5s %i "
+#define EVENT_MAX_DURATION_STR_LEN "4"
+
+/*
+ * The C compiler will concat strings placed together.
+ */
+#define EVENT_LEADING_FORMAT "%10s %5s %" \
+  EVENT_MAX_DURATION_STR_LEN              \
+  "i "
 
 /*
  * Module Ident
@@ -175,16 +186,18 @@ enum FileError saveCalendar(struct EventList *list,
                             const char *filename)
 {
   enum FileError file_error_result;
-  FILE *output_file;
-  struct Event *current_event;
+
 
   if (list->head != NULL) {
     if (filename != NULL) {
+      FILE *output_file;
+
       file_error_result = FILE_NO_ERROR;
 
       output_file = fopen(filename, "wb");
 
       if (output_file != NULL) {
+        struct Event *current_event;
         eventListResetPosition(list);
         current_event = eventListNext(list);
 
@@ -206,6 +219,8 @@ enum FileError saveCalendar(struct EventList *list,
 
           current_event = eventListNext(list);
         }
+
+        fclose(output_file);
       } else {
         file_error_result = FILE_ERROR;
       }
@@ -223,7 +238,7 @@ enum FileError saveCalendar(struct EventList *list,
  * Takes a file error, and returns a string that represents the text
  * of that error.
  */
-char *errorString(enum FileError file_error)
+char *calendarErrorString(enum FileError file_error)
 {
   char *error_text;
 
@@ -356,7 +371,6 @@ static enum FileError readEventName(char **temp_name,
                                     struct CalendarFile *calendar_file)
 {
   enum FileError file_error_result;
-  size_t name_string_length;
 
   file_error_result = readVariableLengthString(calendar_file);
 
@@ -366,7 +380,7 @@ static enum FileError readEventName(char **temp_name,
    */
   if ((file_error_result == FILE_NO_ERROR) ||
       (file_error_result == FILE_EOF)) {
-
+    size_t name_string_length;
     name_string_length = strnlen(calendar_file->read_buffer,
                                  calendar_file->buffer_size);
 
@@ -407,11 +421,11 @@ static enum FileError readEventLocation(char **temp_location,
                                         struct CalendarFile *calendar_file)
 {
   enum FileError file_error_result;
-  size_t location_string_length;
 
   file_error_result = readVariableLengthString(calendar_file);
 
   if (file_error_result == FILE_NO_ERROR) {
+    size_t location_string_length;
     location_string_length = strnlen(calendar_file->read_buffer,
                                      calendar_file->buffer_size);
 
@@ -448,7 +462,7 @@ static enum FileError readVariableLengthString(struct CalendarFile
   size_t length;
   int buffer_space_remaining;
   Boolean not_upto_eol;
-  char *current_buffer_position, *read_result;
+  char *current_buffer_position;
 
   error_result = FILE_NO_ERROR;
 
@@ -458,6 +472,7 @@ static enum FileError readVariableLengthString(struct CalendarFile
   buffer_space_remaining = calendar_file->buffer_size;
 
   while (not_upto_eol) {
+    char *read_result;
     read_result = fgets(current_buffer_position, buffer_space_remaining,
                         calendar_file->current_file);
 
