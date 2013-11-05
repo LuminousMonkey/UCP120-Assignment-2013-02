@@ -1,23 +1,5 @@
 {
    name
-   Memcheck:Cond
-   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
-}
-
-{
-   name
-   Memcheck:Free
-   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
-}
-
-{
-   name
-   Memcheck:Value8
-   obj:/usr/lib/i386-linux-gnu/libfontconfig.so.1.7.0
-}
-
-{
-   name
    Memcheck:Leak
    fun:*alloc
    ...
@@ -67,5 +49,32 @@
    fun:*alloc
    ...
    obj:/lib/i386-linux-gnu/libglib-2.0.so.0.3800.1
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/libpangocairo-1.0.so.0.2800.1
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/libgtk-x11-2.0.so.0.1800.9
+   ...
+}
+
+{
+   name
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   obj:/usr/lib/libpangoft2-1.0.so.0.2800.1
    ...
 }
