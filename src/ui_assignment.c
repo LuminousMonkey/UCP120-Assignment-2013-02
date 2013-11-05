@@ -229,7 +229,6 @@ static void uiAddEvent(void *in_data)
 {
   struct AssignmentState *const state = (struct AssignmentState *)in_data;
   EDIT_PROPERTIES(dialog_properties);
-
   struct DialogEventFields dialog_fields;
   createEventDialogFieldStrings(&dialog_fields);
 
@@ -287,44 +286,38 @@ static void uiEditEvent(void *in_data)
   struct AssignmentState *const state = (struct AssignmentState *)in_data;
   struct Event *event_to_edit;
   EDIT_PROPERTIES(dialog_properties);
-  char *name, *location, *date, *time, *duration;
+  struct DialogEventFields dialog_fields;
 
   event_to_edit = uiFindEvent(state);
 
   if (event_to_edit != NULL) {
-    name = (char *)calloc(1, MAX_LENGTH_OF_NAME + 1);
-    location = (char *)calloc(1, MAX_LENGTH_OF_LOCATION + 1);
-    date = (char *)calloc(1, MAX_DATE_STRING + 1);
-    time = (char *)calloc(1, MAX_TIME_STRING + 1);
-    duration = (char *)calloc(1, MAX_DURATION_STRING + 1);
+    createEventDialogFieldStrings(&dialog_fields);
 
-    if (name != NULL &&
-        location != NULL &&
-        date != NULL &&
-        time != NULL &&
-        duration != NULL) {
+    if (dialog_fields.name != NULL &&
+        dialog_fields.location != NULL &&
+        dialog_fields.date != NULL &&
+        dialog_fields.time != NULL &&
+        dialog_fields.duration != NULL) {
 
       char *dialog_inputs[EDIT_PROPERTIES_SIZE];
-      /* Copy the found event strings over to the edit box */
-      strncat(name, event_to_edit->name, MAX_LENGTH_OF_NAME);
-      strncat(location, event_to_edit->location, MAX_LENGTH_OF_LOCATION);
 
-      sprintf(date, "%04d-%02d-%02d",
+      /* Copy the found event strings over to the edit box */
+      strncat(dialog_fields.name, event_to_edit->name, MAX_LENGTH_OF_NAME);
+      strncat(dialog_fields.location, event_to_edit->location,
+              MAX_LENGTH_OF_LOCATION);
+
+      sprintf(dialog_fields.date, "%04d-%02d-%02d",
               event_to_edit->date.year,
               event_to_edit->date.month,
               event_to_edit->date.day);
 
-      sprintf(time, "%02d:%02d",
+      sprintf(dialog_fields.time, "%02d:%02d",
               event_to_edit->time.hour,
               event_to_edit->time.minutes);
 
-      sprintf(duration, "%d", event_to_edit->duration);
+      sprintf(dialog_fields.duration, "%d", event_to_edit->duration);
 
-      dialog_inputs[NAME_INDEX] = name;
-      dialog_inputs[LOCATION_INDEX] = location;
-      dialog_inputs[DATE_INDEX] = date;
-      dialog_inputs[TIME_INDEX] = time;
-      dialog_inputs[DURATION_INDEX] = duration;
+      mapEventDialogFieldStringsToInputs(dialog_inputs, &dialog_fields);
 
       if (TRUE == dialogBox(state->main_window, ADD_EVENT_TITLE,
                             EDIT_PROPERTIES_SIZE,
@@ -332,8 +325,11 @@ static void uiEditEvent(void *in_data)
                             dialog_inputs)) {
         enum EventError error_result;
 
-        error_result = eventEdit(event_to_edit, date, time, atoi(duration),
-                                 name, location);
+        error_result = eventEdit(event_to_edit, dialog_fields.date,
+                                 dialog_fields.time,
+                                 atoi(dialog_fields.duration),
+                                 dialog_fields.name,
+                                 dialog_fields.location);
 
         if (error_result == EVENT_NO_ERROR) {
           uiSetCalendarText(state);
@@ -344,12 +340,7 @@ static void uiEditEvent(void *in_data)
       }
     }
 
-    /* Clean up anything we might have allocated. */
-    free(name);
-    free(location);
-    free(date);
-    free(time);
-    free(duration);
+    destroyEventDialogFieldStrings(&dialog_fields);
   }
 
   /* Show any errors */
