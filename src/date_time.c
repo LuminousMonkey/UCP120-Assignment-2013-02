@@ -12,22 +12,69 @@
 #include "bool.h"
 #include "date_time.h"
 
+/*
+ * The max and min length we expect for date and time strings.
+ * Any string that is greater than the MAX is too long.
+ */
+#define DATETIME_MIN_DATE_STR_LEN 6
+#define DATETIME_MAX_DATE_STR_LEN 20
+#define DATETIME_MIN_TIME_STR_LEN 3
+#define DATETIME_MAX_TIME_STR_LEN 8
+
 #define NUM_MONTHS_IN_YEAR 12
 
+/*
+ * Maximums for 24 hour clock.
+ * Just for the units, specific logic is in validateTime.
+ */
 #define MAX_HOURS 24
 #define MAX_MINUTES 59
 
-#define MIDDAY_HOUR 12
-
 #define MINUTES_IN_HOURS 60
 
+/*
+ * Strings for the singular, and plurals for hours and minutes.
+ */
 #define HOUR_DESC_SINGULAR "hour"
 #define HOUR_DESC_PLURAL "hours"
 #define MINUTE_DESC_SINGULAR "minute"
 #define MINUTE_DESC_PLURAL "minutes"
 
 /*
+ * How we expect the date to be formatted in the calendar file. Order
+ * is important, if the format changes the order of year, month, day,
+ * then parseDateString needs to be updated.
+ */
+#define EXPECTED_DATE_PARSE_FORMAT "%4d-%2d-%2d"
+
+/*
+ * How we expect the 24 hour time to be formatted in the calendar
+ * file.
+ */
+#define EXPECTED_TIME_PARSE_FORMAT "%2d:%2d"
+
+/*
+ * Format for the formatted string time.
+ */
+#define FORMATTED_TIME_STRING_HOURS_ONLY "%d%s"
+#define FORMATTED_TIME_STRING_HOURS_MINS "%d:%d%s"
+
+/*
+ * Pre-processor macros for the format of the duration string.
+ *
+ * The C compiler will auto append any strings that are placed
+ * together with just whitespace seperating.
+ */
+#define DURATION_FORMATTED_STRING_SEG "%d %s"
+#define SINGLE_UNIT_DURATION_STRING "(" DURATION_FORMATTED_STRING_SEG ")"
+#define TWO_UNIT_DURATION_STRING "(" DURATION_FORMATTED_STRING_SEG ", " \
+  DURATION_FORMATTED_STRING_SEG ")"
+
+/*
  * Forward declarations.
+ *
+ * These are all internal functions to break down the logic into
+ * easier to understand steps. (Because I'm just not that smart).
  */
 static enum DateTimeError checkStrLength(const char *const stDate,
     const size_t min,
@@ -44,9 +91,9 @@ static enum DateTimeError parseTimeString(const char *const stTime,
 static enum DateTimeError validateTime(int hour, int minutes);
 
 /*
- * Given a pointer to a string, will update the given date.
- * It will return the error status, on any error, the Date struct is reset
- * to 0-0-0.
+ * Both dateParse and timeParse just do the simple length check
+ * validation for time and date. They call the more complex
+ * verification functions parseDateString and parseTimeString.
  */
 enum DateTimeError dateParse(const char *const stDate, struct Date *date)
 {
@@ -61,6 +108,9 @@ enum DateTimeError dateParse(const char *const stDate, struct Date *date)
   return error_result;
 }
 
+/*
+ * Check description of dateParse.
+ */
 enum DateTimeError timeParse(const char *const stTime, struct Time *time)
 {
   enum DateTimeError error_result;
@@ -74,12 +124,14 @@ enum DateTimeError timeParse(const char *const stTime, struct Time *time)
   return error_result;
 }
 
+/*
+ * Returns the formatted date for displaying to the calendar.
+ */
 void dateString(char *const outString, const struct Date *const date)
 {
   const char *const months[] = {"January", "February", "March", "April", "May", "June",
                                 "July", "August", "September", "October", "November",
-                                "December"
-                               };
+                                "December"};
 
   sprintf(outString, "%d %s %d", date->day, months[date->month - 1],
           date->year);
@@ -95,30 +147,38 @@ void dateString(char *const outString, const struct Date *const date)
  */
 void timeString(char *const outString, const struct Time *const time)
 {
-  int hour_12;
-  const char *meridies;
+  int hour_12; /* Hour value for 12 hour based clock. */
+  const char *meridies; /* am/pm */
 
   if (time->hour > 11) {
+    /* 12:00 - 24:00 */
     meridies = "pm";
   } else {
+    /* 00:00 - 11:59 */
     meridies = "am";
   }
 
   hour_12 = (time->hour % 12);
 
+  /* Special case for 0:00, because modulo will not give correct hour. */
   if (hour_12 == 0) {
     hour_12 = 12;
   }
 
+  /* On the hour times are displayed without an minutes. */
   if (time->minutes == 0) {
-    sprintf(outString, "%d%s", hour_12, meridies);
+    sprintf(outString, FORMATTED_TIME_STRING_HOURS_ONLY, hour_12,
+            meridies);
   } else {
-    sprintf(outString, "%d:%d%s", hour_12, time->minutes, meridies);
+    sprintf(outString, FORMATTED_TIME_STRING_HOURS_MINS, hour_12,
+            time->minutes, meridies);
   }
 }
 
 /*
- * TODO: Find max possible string length and enforce it.
+ * Output the formatted duration to the given string.
+ *
+ * WARNING: This does not enforce the length of the output string.
  */
 void durationString(char *const outString, int duration)
 {
@@ -156,11 +216,12 @@ void durationString(char *const outString, int duration)
       single_time_unit_desc = minute_description;
     }
 
-    sprintf(outString, "(%d %s)", single_time_unit, single_time_unit_desc);
+    sprintf(outString, SINGLE_UNIT_DURATION_STRING, single_time_unit,
+            single_time_unit_desc);
   } else {
     /* We have both */
-    sprintf(outString, "(%d %s, %d %s)", hours, hour_description, minutes,
-            minute_description);
+    sprintf(outString, TWO_UNIT_DURATION_STRING, hours, hour_description,
+            minutes, minute_description);
   }
 }
 
@@ -204,7 +265,8 @@ static enum DateTimeError parseDateString(const char *const stDate,
   date->month = 0;
   date->day = 0;
 
-  scan_result = sscanf(stDate, "%4d-%2d-%2d", &year, &month, &day);
+  scan_result = sscanf(stDate, EXPECTED_DATE_PARSE_FORMAT,
+                       &year, &month, &day);
 
   /* Haven't scanned three integers, then it's a problem. */
   if (scan_result != 3 || scan_result == EOF) {
@@ -250,6 +312,7 @@ static Boolean isLeapYear(int year)
 {
   Boolean result = FALSE;
 
+  /* Follows the typical leap year calculation */
   if (year % 400 == 0) {
     result = TRUE;
   } else if (year % 100 == 0) {
@@ -265,6 +328,7 @@ static Boolean isLeapYear(int year)
 
 /*
  * Negative years are invalid, BC not covered.
+ * There is no year 0.
  */
 static enum DateTimeError checkYear(int year)
 {
@@ -331,7 +395,7 @@ static enum DateTimeError parseTimeString(const char *const stTime,
   time->hour = 0;
   time->minutes = 0;
 
-  scan_result = sscanf(stTime, "%2d:%2d", &hour, &minutes);
+  scan_result = sscanf(stTime, EXPECTED_TIME_PARSE_FORMAT, &hour, &minutes);
 
   /* Haven't scanned two integers. */
   if (scan_result != 2 || scan_result == EOF) {
