@@ -41,23 +41,10 @@
 #define MINUTE_DESC_PLURAL "minutes"
 
 /*
- * How we expect the date to be formatted in the calendar file. Order
- * is important, if the format changes the order of year, month, day,
- * then parseDateString needs to be updated.
- */
-#define EXPECTED_DATE_PARSE_FORMAT "%4d-%2d-%2d"
-
-/*
- * How we expect the 24 hour time to be formatted in the calendar
- * file.
- */
-#define EXPECTED_TIME_PARSE_FORMAT "%2d:%2d"
-
-/*
  * Format for the formatted string time.
  */
 #define FORMATTED_TIME_STRING_HOURS_ONLY "%d%s"
-#define FORMATTED_TIME_STRING_HOURS_MINS "%d:%d%s"
+#define FORMATTED_TIME_STRING_HOURS_MINS "%d:%02d%s"
 
 /*
  * Pre-processor macros for the format of the duration string.

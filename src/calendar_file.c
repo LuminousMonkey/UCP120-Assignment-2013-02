@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "calendar_file.h"
+#include "date_time.h"
 #include "event_list.h"
 #include "event.h"
 
@@ -202,7 +203,9 @@ enum FileError saveCalendar(struct EventList *list,
         current_event = eventListNext(list);
 
         while (current_event != NULL) {
-          fprintf(output_file, "%04d-%02d-%02d %02d:%02d %d %s\n",
+          fprintf(output_file, EXPECTED_DATE_PARSE_FORMAT " "
+                  EXPECTED_TIME_PARSE_FORMAT " "
+                  "%d %s\n",
                   current_event->date.year,
                   current_event->date.month,
                   current_event->date.day,
