@@ -34,6 +34,7 @@
 #define DELETE_EVENT_TITLE "Delete Event"
 
 #define FIND_EVENT "Find Event"
+#define EVENT_NAME_PROMPT "Event name (exact, case-sensitive)"
 
 #define EDIT_PROPERTIES(var_name) InputProperties var_name[] = {  \
                                                                   {"Event Name", MAX_LENGTH_OF_NAME, FALSE},                          \
@@ -387,7 +388,7 @@ static struct Event *uiFindEvent(struct AssignmentState *state)
   assert(event_name_to_find != NULL);
   dialog_inputs = &event_name_to_find;
 
-  dialog_properties.label = FIND_EVENT;
+  dialog_properties.label = EVENT_NAME_PROMPT;
   dialog_properties.maxLength = MAX_LENGTH_OF_NAME;
   dialog_properties.isMultiLine = FALSE;
 
@@ -430,6 +431,8 @@ static void uiSetCalendarText(struct AssignmentState *state)
   if (calendar_text != NULL) {
     setText(state->main_window, calendar_text);
     free(calendar_text);
+  } else {
+    setText(state->main_window, "");
   }
 }
 
