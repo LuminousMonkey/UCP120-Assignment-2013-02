@@ -19,7 +19,7 @@
  */
 static void updateEventString(struct Event *const event);
 static Boolean durationValid(int duration);
-static enum EventError eventSetName(const char *const name, char **event_name);
+static enum EventError eventSetName(struct Event *const event, const char *const name);
 static enum EventError eventSetLocation(const char *const name,
                                         char **location);
 void eventDestroy(struct Event *event);
@@ -56,7 +56,7 @@ enum EventError eventCreate(struct Event **new_event,
           (*new_event)->duration = duration;
 
           if (name != NULL && name[0] != '\0') {
-            eventSetName(name, &(*new_event)->name);
+            eventSetName(*new_event, name);
             eventSetLocation(location, & (*new_event)->location);
 
             updateEventString(*new_event);
@@ -118,7 +118,7 @@ enum EventError eventEdit(struct Event *event_to_edit,
     free(event_to_edit->name);
     free(event_to_edit->location);
 
-    eventSetName(temp_event->name, &(event_to_edit->name));
+    eventSetName(event_to_edit, temp_event->name);
     eventSetLocation(temp_event->location, &(event_to_edit->location));
     event_to_edit->date = temp_event->date;
     event_to_edit->time = temp_event->time;
@@ -223,7 +223,7 @@ static void updateEventString(struct Event *const event)
   event->formatted_string_length = string_length;
 }
 
-static enum EventError eventSetName(const char *const name, char **event_name)
+static enum EventError eventSetName(struct Event *const event, const char *const name)
 {
   enum EventError result;
   size_t name_length;
@@ -236,11 +236,11 @@ static enum EventError eventSetName(const char *const name, char **event_name)
   }
 
   if (name_length > 0) {
-    *event_name = (char *) malloc(name_length + 1);
+    event->name = (char *) malloc(name_length + 1);
 
-    if (*event_name != NULL) {
-      **event_name = '\0';
-      strncat(*event_name, name, name_length);
+    if (event->name != NULL) {
+      *event->name = '\0';
+      strncat(event->name, name, name_length);
     } else {
       result = EVENT_INTERNAL_ERROR;
     }
