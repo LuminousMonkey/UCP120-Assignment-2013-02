@@ -14,7 +14,7 @@ UTLIBS = $(shell pkg-config --libs cunit)
 
 # Should not have to change anything below here.
 CC := gcc
-OUTDIRS := obj tests tests/obj
+OUTDIRS := obj tests tests/obj tests/saved
 
 SRCFILES := $(wildcard src/*.c)
 
@@ -27,10 +27,6 @@ UTOUTDIRS := tests
 UTSRCFILES := $(wildcard tests/src/*.c)
 UTOBJFILES := $(patsubst tests/src/%.c,tests/obj/%.o,$(UTSRCFILES))
 UTDEPFILES := $(patsubst tests/src/%.c,tests/obj/%.d,$(UTSRCFILES))
-
-# GCC does the work for us on determining file dependencies.
--include $(DEPFILES)
--include $(UTDEPFILES)
 
 .PHONY: clean dirs
 
@@ -52,6 +48,9 @@ clean:
 	rm -rf *.o *.d
 	rm -f $(UTOBJFILES) $(UTDEPFILES)
 
+# GCC does the work for us on determining file dependencies.
+-include $(DEPFILES)
+
 tests: tests/unittests
 
 # Rule for building CUnit
@@ -60,3 +59,5 @@ tests/unittests: $(UTOBJFILES)
 
 tests/obj/%.o: tests/src/%.c
 	$(CC) $(UTCFLAGS) $(pathsub tests/obj/%.o, tests/obj/%.d,$@) -c $< -o $@
+
+-include $(UTDEPFILES)

@@ -434,7 +434,10 @@ static enum FileError readEventLocation(char **temp_location,
     location_string_length = strnlen(calendar_file->read_buffer,
                                      calendar_file->buffer_size);
 
-    if (location_string_length > EVENT_LOCATION_MIN_LENGTH) {
+    /*
+     * Only process the location if there's a string there at all.
+     */
+    if (location_string_length > 0) {
       *temp_location = (char *) malloc(location_string_length + 1);
 
       if (*temp_location != NULL) {
@@ -457,8 +460,19 @@ static enum FileError readEventLocation(char **temp_location,
  * We will get a needless expansion of the read buffer if we hit the
  * EOF without getting a newline character before it.
  *
+ * There is one problem that has to be fixed, if time. There is no
+ * upper limit set on the string it will read. The event functions
+ * will limit these to MAX_LENGTH_OF_(NAME/LOCATION). But file reading
+ * is not limited.
+ *
+ * This is a historical reason, this code was written before the GUI
+ * code.
+ *
  * An EOF here is not an error, but has to be returned as a separate
  * code so the caller knows to stop reading the file.
+ *
+ * calendar_file - Out struct that contains the file handle, and our
+ *                 read buffer, this read buffer will expand as needed.
  */
 static enum FileError readVariableLengthString(struct CalendarFile
     *calendar_file)
@@ -491,9 +505,13 @@ static enum FileError readVariableLengthString(struct CalendarFile
         calendar_file->read_buffer[length - 1] = '\0';
         not_upto_eol = FALSE;
       } else {
-        /* Reallocate */
+        /*
+         * Reallocate, doubling your current buffer size is slightly
+         * better memory management wise.
+         */
         calendar_file->read_buffer = (char *) realloc(calendar_file->read_buffer,
                                      calendar_file->buffer_size * 2);
+
         /* Total size remaining (including space used by terminator) */
         buffer_space_remaining = calendar_file->buffer_size + 1;
         current_buffer_position = calendar_file->read_buffer +

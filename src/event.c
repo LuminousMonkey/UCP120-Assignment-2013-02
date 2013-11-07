@@ -17,7 +17,7 @@
 /*
  * Forward declarations.
  */
-static int eventString(struct Event *const event, char **const outString);
+static int eventString(struct Event *const event);
 static Boolean durationValid(int duration);
 static enum EventError eventSetName(const char *const name, char **event_name);
 static enum EventError eventSetLocation(const char *const name,
@@ -27,9 +27,9 @@ void eventDestroy(struct Event *event);
 /*
  * Creates an event.
  *
- * Does not everify new_even is not NULL.
- * It is expected that date and time are passed in as strings.
- * The date/time code is supposed to handle parsing those.
+ * Note: Only returns the first error it comes across. Probably need
+ * to update so that it will verify all fields so the user can know
+ * which ones are faulty.
  */
 enum EventError eventCreate(struct Event **new_event,
                             const char *const stDate,
@@ -40,6 +40,8 @@ enum EventError eventCreate(struct Event **new_event,
 {
   enum EventError error_result;
   error_result = EVENT_NO_ERROR;
+
+  assert(new_event != NULL);
 
   *new_event = (struct Event *) malloc(sizeof(struct Event));
 
@@ -57,8 +59,7 @@ enum EventError eventCreate(struct Event **new_event,
             eventSetName(name, &(*new_event)->name);
             eventSetLocation(location, & (*new_event)->location);
 
-            (*new_event)->formatted_string_length = eventString(*new_event,
-                                                    &(*new_event)->formatted_string);
+            (*new_event)->formatted_string_length = eventString(*new_event);
           } else {
             error_result = EVENT_NAME_INVALID;
           }
@@ -86,6 +87,8 @@ enum EventError eventCreate(struct Event **new_event,
 
 /*
  * Edit the given event.
+ *
+ * Like event create, only returns the first error it's found.
  */
 enum EventError eventEdit(struct Event *event_to_edit,
                           const char *const stDate,
@@ -113,7 +116,6 @@ enum EventError eventEdit(struct Event *event_to_edit,
      */
     free(event_to_edit->name);
     free(event_to_edit->location);
-    free(event_to_edit->formatted_string);
 
     eventSetName(temp_event->name, &(event_to_edit->name));
     eventSetLocation(temp_event->location, &(event_to_edit->location));
@@ -126,7 +128,7 @@ enum EventError eventEdit(struct Event *event_to_edit,
      * want to make sure mistake here show up quickly in the
      * textbox.
      */
-    eventString(event_to_edit, &(event_to_edit->formatted_string));
+    eventString(event_to_edit);
     event_to_edit->formatted_string_length =
       strlen(event_to_edit->formatted_string);
   }
@@ -161,14 +163,18 @@ void eventDestroy(struct Event *event)
  *
  * It's doubling up storage space, but it makes building up the string
  * for all the events a bit easier.
+ *
+ * event - Event to build the formatted string for.
  */
-static int eventString(struct Event *const event, char **const outString)
+static int eventString(struct Event *const event)
 {
   int string_length;
 
   char date_string[MAX_DATE_STRING];
   char time_string[MAX_TIME_STRING];
   char duration_string[MAX_DURATION_STRING];
+
+  free(event->formatted_string);
 
   string_length = strlen(event->name) + 1;
 
@@ -189,31 +195,31 @@ static int eventString(struct Event *const event, char **const outString)
    * Allocate the string (+1 for terminator, returned string size does
    * not include this.)
    */
-  *outString = (char *)malloc(string_length + 1);
+  event->formatted_string = (char *)malloc(string_length + 1);
 
   /* Can't recover from a memory error like this. */
-  assert(outString != NULL);
+  assert(event->formatted_string != NULL);
 
   /* String building here */
-  **outString = '\0';
-  strcat(*outString, event->name);
-  strcat(*outString, " ");
+  *event->formatted_string = '\0';
+  strcat(event->formatted_string, event->name);
+  strcat(event->formatted_string, " ");
 
   if (event->location != NULL) {
     /* Add the location string */
-    strcat(*outString, "@ ");
-    strcat(*outString, event->location);
-    strcat(*outString, " ");
+    strcat(event->formatted_string, "@ ");
+    strcat(event->formatted_string, event->location);
+    strcat(event->formatted_string, " ");
   }
 
-  strncat(*outString, duration_string, MAX_DURATION_STRING);
-  strcat(*outString, "\n");
-  strncat(*outString, date_string, MAX_DATE_STRING);
+  strncat(event->formatted_string, duration_string, MAX_DURATION_STRING);
+  strcat(event->formatted_string, "\n");
+  strncat(event->formatted_string, date_string, MAX_DATE_STRING);
 
-  strcat(*outString, ", ");
-  strncat(*outString, time_string, MAX_TIME_STRING);
+  strcat(event->formatted_string, ", ");
+  strncat(event->formatted_string, time_string, MAX_TIME_STRING);
 
-  return string_length;
+  event->formatted_string_length = string_length;
 }
 
 static enum EventError eventSetName(const char *const name, char **event_name)
