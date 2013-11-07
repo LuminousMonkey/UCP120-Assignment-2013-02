@@ -36,10 +36,6 @@
 #define EVENT_MAX_DATE_STR_LEN 11
 #define EVENT_MAX_TIME_STR_LEN 6
 #define EVENT_MAX_DURATION_STR_LEN "10"
-
-/*
- * The C compiler will concat strings placed together.
- */
 #define EVENT_LEADING_FORMAT "%10s %5s %" \
   EVENT_MAX_DURATION_STR_LEN              \
   "i "
@@ -79,7 +75,7 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
 static enum FileError readEventName(char **temp_name,
                                     struct CalendarFile *calendar_file);
 static enum FileError readVariableLengthString(struct CalendarFile
-    *calendar_file);
+                                               *calendar_file);
 static enum FileError readEventLocation(char **temp_location,
                                         struct CalendarFile *calendar_file);
 
@@ -188,7 +184,7 @@ enum FileError saveCalendar(struct EventList *list,
 {
   enum FileError file_error_result;
 
-
+  /* Check that it's not an empty list. */
   if (list->head != NULL) {
     if (filename != NULL) {
       FILE *output_file;
@@ -202,9 +198,12 @@ enum FileError saveCalendar(struct EventList *list,
         eventListResetPosition(list);
         current_event = eventListNext(list);
 
+        /*
+         * Loop through the list, saving each entry to the file.
+         */
         while (current_event != NULL) {
-          fprintf(output_file, EXPECTED_DATE_PARSE_FORMAT " "
-                  EXPECTED_TIME_PARSE_FORMAT " "
+          fprintf(output_file, FILE_DATE_FORMAT " "
+                  FILE_TIME_FORMAT " "
                   "%d %s\n",
                   current_event->date.year,
                   current_event->date.month,
@@ -214,17 +213,18 @@ enum FileError saveCalendar(struct EventList *list,
                   current_event->duration,
                   current_event->name);
 
+          /* Only save a location if we have one. */
           if (current_event->location != NULL) {
             fprintf(output_file, "%s\n", current_event->location);
           }
 
           fprintf(output_file, "\n");
-
           current_event = eventListNext(list);
         }
 
         fclose(output_file);
       } else {
+        /* Couldn't open the file */
         file_error_result = FILE_ERROR;
       }
     } else {
@@ -283,7 +283,7 @@ char *calendarErrorString(enum FileError file_error)
  * read buffer as needed.
  *
  * IF this function returns FILE_NO_ERROR, or FILE_EOF, then these are
- * not errors. Any formatting errors of the file will be returned as
+ * no errors. Any formatting errors of the file will be returned as
  * FILE_INVALID_FORMAT.
  *
  * loaded_event - This is updated to point to the event read from the
@@ -340,18 +340,13 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
                                    temp_name, temp_location);
     }
 
-    if (temp_location != NULL) {
-      free(temp_location);
-    }
-
-    if (temp_name != NULL) {
-      free(temp_name);
-    }
+    free(temp_location);
+    free(temp_name);
 
   } else {
     /*
      * Didn't get the start of an event when we expected one.
-     * If we get anm EOF here, it probably means that we've got no more entries.
+     * If we get an EOF here, it probably means that we've got no more entries.
      */
     if (feof(calendar_file->current_file)) {
       file_error_result = FILE_EOF;
@@ -366,15 +361,19 @@ static enum FileError readEventFromFile(struct Event **loaded_event,
 /*
  * Attempts to read the event name from the current file position.
  *
+ * Returns FILE_NO_ERROR if everything it OK.
+ *
  * temp_name - Returns a character pointer to the name string of the event.
  * calendar_file - Calendar file struct for holding our read buffer, etc.
- *
  */
 static enum FileError readEventName(char **temp_name,
                                     struct CalendarFile *calendar_file)
 {
   enum FileError file_error_result;
 
+  /*
+   * Read up to the next newline or EOF.
+   */
   file_error_result = readVariableLengthString(calendar_file);
 
   /*
@@ -415,6 +414,8 @@ static enum FileError readEventName(char **temp_name,
 /*
  * Attempts to read the event location from the current file position.
  *
+ * Returns FILE_NO_ERROR if everything it OK.
+ *
  * temp_location - Returns a character pointer to the location string
  *                 of the event.
  * calendar_file - Calendar file struct for holding our read buffer,
@@ -425,6 +426,7 @@ static enum FileError readEventLocation(char **temp_location,
 {
   enum FileError file_error_result;
 
+  /* Read upto the next newline or EOF. */
   file_error_result = readVariableLengthString(calendar_file);
 
   if (file_error_result == FILE_NO_ERROR) {
@@ -432,7 +434,7 @@ static enum FileError readEventLocation(char **temp_location,
     location_string_length = strnlen(calendar_file->read_buffer,
                                      calendar_file->buffer_size);
 
-    if (location_string_length > 1) {
+    if (location_string_length > EVENT_LOCATION_MIN_LENGTH) {
       *temp_location = (char *) malloc(location_string_length + 1);
 
       if (*temp_location != NULL) {

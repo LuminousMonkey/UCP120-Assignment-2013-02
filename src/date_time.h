@@ -19,13 +19,13 @@
  * is important, if the format changes the order of year, month, day,
  * then parseDateString needs to be updated.
  */
-#define EXPECTED_DATE_PARSE_FORMAT "%04d-%02d-%02d"
+#define FILE_DATE_FORMAT "%04d-%02d-%02d"
 
 /*
  * How we expect the 24 hour time to be formatted in the calendar
  * file.
  */
-#define EXPECTED_TIME_PARSE_FORMAT "%02d:%02d"
+#define FILE_TIME_FORMAT "%02d:%02d"
 
 /*
  * Date structure.

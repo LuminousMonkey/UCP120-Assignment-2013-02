@@ -21,9 +21,10 @@
 
 /*
  * We must have at least this number of characters to consider the
- * name a valid length.
+ * name, and location a valid length.
  */
 #define EVENT_NAME_MIN_LENGTH 3
+#define EVENT_LOCATION_MIN_LENGTH 3
 
 /*
  * Max length for name and location strings, and buffers must be this

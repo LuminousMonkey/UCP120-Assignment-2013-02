@@ -31,12 +31,12 @@
  */
 enum FileError {
   FILE_NO_ERROR,
-  FILE_EOF,
-  FILE_ERROR,
+  FILE_EOF, /* End of file has been reached */
+  FILE_ERROR, /* Could not open the file for some reason. */
   FILE_INVALID_FORMAT,
   FILE_NO_FILENAME,
-  FILE_EMPTY_LIST,
-  FILE_INTERNAL_ERROR
+  FILE_EMPTY_LIST, /* When trying to save empty list. */
+  FILE_INTERNAL_ERROR /* Generally a memory allocation fault. */
 };
 
 /*
@@ -46,7 +46,7 @@ enum FileError {
  * list - Pointer to a list already created with eventListCreate.
  * filename - A string of the calendar file to load.
  *
- * Returns and error status, FILE_NO_ERROR and FILE_EOF mean there
+ * Returns an error status, FILE_NO_ERROR and FILE_EOF indicate there
  * were no errors.
  *
  * If there was an error, then it's up to the caller of this function to
@@ -62,6 +62,8 @@ enum FileError loadCalendar(struct EventList *list,
  *        null, or empty list will not save anything.
  *
  * filename - A string of the calendar file to save.
+ *
+ * Returns a file error code.
  */
 enum FileError saveCalendar(struct EventList *list,
                             const char *filename);
@@ -69,6 +71,11 @@ enum FileError saveCalendar(struct EventList *list,
 /*
  * Given a file error, return a string that at least describes the
  * error a little bit.
+ *
+ * file_error - Error code returned.
+ *
+ * Returns a string of that error that is supposed to be more human
+ * readable.
  */
 char *calendarErrorString(enum FileError file_error);
 

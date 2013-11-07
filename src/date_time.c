@@ -252,7 +252,7 @@ static enum DateTimeError parseDateString(const char *const stDate,
   date->month = 0;
   date->day = 0;
 
-  scan_result = sscanf(stDate, EXPECTED_DATE_PARSE_FORMAT,
+  scan_result = sscanf(stDate, FILE_DATE_FORMAT,
                        &year, &month, &day);
 
   /* Haven't scanned three integers, then it's a problem. */
@@ -382,7 +382,7 @@ static enum DateTimeError parseTimeString(const char *const stTime,
   time->hour = 0;
   time->minutes = 0;
 
-  scan_result = sscanf(stTime, EXPECTED_TIME_PARSE_FORMAT, &hour, &minutes);
+  scan_result = sscanf(stTime, FILE_TIME_FORMAT, &hour, &minutes);
 
   /* Haven't scanned two integers. */
   if (scan_result != 2 || scan_result == EOF) {
