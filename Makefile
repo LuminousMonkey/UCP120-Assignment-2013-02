@@ -5,10 +5,12 @@ LIBS = $(shell pkg-config --libs gtk+-2.0)
 # Cflags for both unit tests and assignment
 # Enable debugging for everything.
 # Use MMD so GCC generates dep files for us.
+# No optimisation enabled.
 COMMON_CFLAGS = -O0 -g -MMD -pedantic -Wall -Wextra
 CFLAGS = $(COMMON_CFLAGS) $(shell pkg-config --cflags gtk+-2.0)
 
 # Unit testing flags
+# CUnit library needs to be installed.
 UTCFLAGS = $(COMMON_CFLAGS) $(shell pkg-config --cflags cunit)
 UTLIBS = $(shell pkg-config --libs cunit)
 
@@ -28,6 +30,7 @@ UTSRCFILES := $(wildcard tests/src/*.c)
 UTOBJFILES := $(patsubst tests/src/%.c,tests/obj/%.o,$(UTSRCFILES))
 UTDEPFILES := $(patsubst tests/src/%.c,tests/obj/%.d,$(UTSRCFILES))
 
+# Clean and dirs tasks should always run when asked.
 .PHONY: clean dirs
 
 all: dirs $(PROG)
@@ -45,15 +48,14 @@ obj/%.o: src/%.c
 
 clean:
 	rm -f $(OBJFILES) $(DEPFILES) $(PROG)
-	rm -rf *.o *.d
-	rm -f $(UTOBJFILES) $(UTDEPFILES)
+	rm -f $(UTOBJFILES) $(UTDEPFILES) tests/unittests tests/saved/*
 
 # GCC does the work for us on determining file dependencies.
 -include $(DEPFILES)
 
 tests: tests/unittests
 
-# Rule for building CUnit
+# Rule for building unit testing exe
 tests/unittests: $(UTOBJFILES)
 	$(CC) $(UTCFLAGS) -o $@ $^ $(UTLIBS)
 
