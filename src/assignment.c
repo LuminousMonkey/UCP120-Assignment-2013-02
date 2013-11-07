@@ -8,6 +8,7 @@
 
 #include "assignment_state.h"
 #include "calendar_file.h"
+#include "event_list.h"
 #include "ui_assignment.h"
 
 /*
@@ -42,6 +43,8 @@ int main(int argc, char *argv[])
     if (load_result != FILE_NO_ERROR && load_result != FILE_EOF) {
       state.error =
         "There was an loading calendar file, starting with empty calendar.";
+      eventListDestroy(state.event_list);
+      state.event_list = eventListCreate();
     }
   }
 
