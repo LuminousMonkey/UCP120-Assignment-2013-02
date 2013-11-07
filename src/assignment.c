@@ -4,8 +4,6 @@
  * Author: Mike Aldred
  */
 
-#include <stdio.h>
-
 #include "assignment_state.h"
 #include "calendar_file.h"
 #include "event_list.h"
@@ -53,5 +51,9 @@ int main(int argc, char *argv[])
   uiCleanup(&state);
   eventListDestroy(state.event_list);
 
+  /*
+   * state.error_code unimplimented. Reserved for the different
+   * _INTERNAL type errors.
+   */
   return state.error_code;
 }

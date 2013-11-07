@@ -23,7 +23,7 @@ static enum EventError eventSetName(struct Event *const event,
                                     const char *const name);
 static enum EventError eventSetLocation(struct Event *const event,
                                         const char *const location);
-void eventDestroy(struct Event *event);
+void eventDestroy(struct Event *const event);
 
 /*
  * Creates an event.
@@ -142,7 +142,7 @@ enum EventError eventEdit(struct Event *event_to_edit,
  * Frees up the whole event, including any allocated strings for name
  * and location.
  */
-void eventDestroy(struct Event *event)
+void eventDestroy(struct Event *const event)
 {
   if (event != NULL) {
     free(event->name);
@@ -260,6 +260,12 @@ static enum EventError eventSetName(struct Event *const event,
   return result;
 }
 
+/*
+ * Copies over the location string into the given event.
+ *
+ * event - Event that we want to update.
+ * location - String that the event's location should be updated to.
+ */
 static enum EventError eventSetLocation(struct Event *const event,
                                         const char *const location)
 {
@@ -296,6 +302,10 @@ static enum EventError eventSetLocation(struct Event *const event,
 
 /*
  * Durations must be a non-negative integer.
+ *
+ * Returns TRUE if the duration is valid.
+ *
+ * duration - Duration to validate.
  */
 static Boolean durationValid(int duration)
 {
