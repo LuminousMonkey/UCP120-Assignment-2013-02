@@ -20,6 +20,9 @@
 
 #define MAIN_WINDOW_TITLE "UCP 120 Assignment"
 
+/*
+ * Our labels for the buttons.
+ */
 #define LOAD_BUTTON_LABEL "Load"
 #define SAVE_BUTTON_LABEL "Save"
 #define ADD_BUTTON_LABEL "Add"
@@ -27,25 +30,39 @@
 #define DELETE_BUTTON_LABEL "Delete"
 #define QUIT_BUTTON_LABEL "Quit"
 
+/*
+ * Titles for the different dialog boxes a user might get.
+ */
 #define LOAD_CALENDAR_TITLE "Load Calendar"
 #define SAVE_CALENDAR_TITLE "Save Calendar"
 #define ADD_EVENT_TITLE "Add Event"
 #define EDIT_EVENT_TITLE "Edit Event"
 #define DELETE_EVENT_TITLE "Delete Event"
+#define FIND_EVENT_TITLE "Find Event"
 
-#define FIND_EVENT "Find Event"
+/*
+ * Label for field that prompts for the event name.
+ * Shown whenever user it prompted to find an event.
+ */
 #define EVENT_NAME_PROMPT "Event name (exact, case-sensitive)"
 
+/*
+ * Both the addEvent, and editEvent functions share the layout for the fields of an event.
+ * This macro is used to create the variable that holds those properties.
+ */
 #define EDIT_PROPERTIES(var_name) InputProperties var_name[] = {  \
-                                                                  {"Event Name", MAX_LENGTH_OF_NAME, FALSE},                          \
-                                                                  {"Location", MAX_LENGTH_OF_LOCATION, FALSE},                        \
-                                                                  {"Date (YYYY-MM-DD)", MAX_DATE_STRING, FALSE},                      \
-                                                                  {"Time", MAX_TIME_STRING, FALSE},                                   \
-                                                                  {"Duration", MAX_DURATION_STRING, FALSE}}
+    {"Event Name", MAX_LENGTH_OF_NAME, FALSE},                          \
+    {"Location", MAX_LENGTH_OF_LOCATION, FALSE},                        \
+    {"Date (YYYY-MM-DD)", MAX_DATE_STRING, FALSE},                      \
+    {"Time", MAX_TIME_STRING, FALSE},                                   \
+    {"Duration", MAX_DURATION_STRING, FALSE}}
 
 /*
  * The index of the strings to be edited passed in via
  * InputProperties.
+ *
+ * These need to be updated if the ordering of the fields in the
+ * EDIT_PROPERTIES macro changes.
  */
 #define NAME_INDEX 0
 #define LOCATION_INDEX 1
@@ -53,6 +70,7 @@
 #define TIME_INDEX 3
 #define DURATION_INDEX 4
 
+/* Number of fields we have for the edit/add event fields */
 #define EDIT_PROPERTIES_SIZE 5
 
 /*
@@ -75,20 +93,17 @@ struct DialogEventFields {
   char *duration;
 };
 
-/*
- * Forward declarations.
- */
-
-/* The UI button callbacks */
+/* Forward declarations. */
+/* The UI button callbacks. */
 static void uiLoadCalendar(void *in_data);
 static void uiSaveCalendar(void *in_data);
 static void uiAddEvent(void *in_data);
 static void uiEditEvent(void *in_data);
 static void uiDeleteEvent(void *in_data);
 
-/* Utility functions */
-static struct Event *uiFindEvent(struct AssignmentState *state);
-static void uiShowError(struct AssignmentState *state);
+/* Utility functions. */
+static struct Event *uiFindEvent(struct AssignmentState *const state);
+static void uiShowError(struct AssignmentState *const state);
 static void uiSetCalendarText(struct AssignmentState *state);
 static void uiClearCalendarText(struct AssignmentState *state);
 
@@ -107,7 +122,7 @@ static void mapEventDialogFieldStringsToInputs(char *inputs[],
  * of the application, and is the main method of communication between
  * the different functions.
  */
-void uiSetup(struct AssignmentState *state)
+void uiSetup(struct AssignmentState *const state)
 {
   state->main_window = createWindow(MAIN_WINDOW_TITLE);
 
@@ -128,9 +143,9 @@ void uiSetup(struct AssignmentState *state)
 /*
  * UI Run
  *
- * Like UI Cleanup, this is just a simple wrapper. This just gets rid
- * of a tiny bit of coupling between the main assignment function and
- * the GUI lib provided by Dave.
+ * This is just a simple wrapper, just gets rid of a tiny bit of
+ * coupling between the main assignment function and the GUI lib
+ * provided by Dave.
  */
 void uiRun(const struct AssignmentState *const state)
 {
@@ -140,13 +155,29 @@ void uiRun(const struct AssignmentState *const state)
 /*
  * UI Cleanup.
  *
- * Performs whatever is needed to clean up the GUI before we quit.
+ * Like UI Run, it's just a simple wrapper.
  */
-void uiCleanup(struct AssignmentState *state)
+void uiCleanup(const struct AssignmentState *const state)
 {
   freeWindow(state->main_window);
 }
 
+/*
+ * UI Load Calendar
+ *
+ * When the user presses the Load Calendar button, this is called,
+ * getting passed the application state.
+ *
+ * This will then prompt the user for the calendar file, and try to
+ * load the calendar into memory.
+ *
+ * If there is an error any loaded calendars will be destroyed.
+ * This is not a very user friendly thing to do.
+ *
+ * If there is an error, then it will be displayed to the user.
+ *
+ * in_data - Pointer to the application state.
+ */
 static void uiLoadCalendar(void *in_data)
 {
   struct AssignmentState *const state = (struct AssignmentState *)in_data;
@@ -154,20 +185,30 @@ static void uiLoadCalendar(void *in_data)
   char **dialog_inputs;
   char *file_name;
 
-  file_name = (char *)calloc(1, MAX_FILENAME_LENGTH + 1);
+  /* Allocate the space we need for the filename prompt. */
+  file_name = (char *)malloc(MAX_FILENAME_LENGTH + 1);
   assert(file_name != NULL);
 
+  /* Make sure the GUI considers the string "empty" */
+  *file_name = '\0';
+
+  /* We just have the one input. */
   dialog_inputs = &file_name;
 
   dialog_properties.label = LOAD_CALENDAR_TITLE;
   dialog_properties.maxLength = MAX_FILENAME_LENGTH;
   dialog_properties.isMultiLine = FALSE;
 
+  /*
+   * Try loading the file, if the user clicks "OK", otherwise we do
+   * nothing else but return to the main window.
+   */
   if (TRUE == dialogBox(state->main_window, LOAD_CALENDAR_TITLE, 1,
                         &dialog_properties,
                         dialog_inputs)) {
     enum FileError file_error;
 
+    /* Clear off the current calendar. */
     eventListDestroy(state->event_list);
     state->event_list = eventListCreate();
 
@@ -377,7 +418,7 @@ static void uiDeleteEvent(void *in_data) {
  *
  * Returns a pointer to the event, NULL if no event was found.
  */
-static struct Event *uiFindEvent(struct AssignmentState *state)
+static struct Event *uiFindEvent(struct AssignmentState *const state)
 {
   InputProperties dialog_properties;
   struct Event *result;
@@ -392,7 +433,7 @@ static struct Event *uiFindEvent(struct AssignmentState *state)
   dialog_properties.maxLength = MAX_LENGTH_OF_NAME;
   dialog_properties.isMultiLine = FALSE;
 
-  if (TRUE == dialogBox(state->main_window, FIND_EVENT, 1,
+  if (TRUE == dialogBox(state->main_window, FIND_EVENT_TITLE, 1,
                         &dialog_properties,
                         dialog_inputs)) {
     result = eventListFind(state->event_list, event_name_to_find);
@@ -414,7 +455,7 @@ static struct Event *uiFindEvent(struct AssignmentState *state)
  * Does no deallocation of memory, it just expects a pointer to an
  * already valid string.
  */
-static void uiShowError(struct AssignmentState *state)
+static void uiShowError(struct AssignmentState *const state)
 {
   if (state->error != NULL) {
     messageBox(state->main_window, (char *)state->error);

@@ -1,0 +1,53 @@
+Shiny bits for you, fresh off the presses.
+
+The code is broken up into different modules, based off a bottom up
+approach, with each file intending to be used with the struct provided
+in it's header file.
+
+bool
+====
+
+C89 doesn't give a boolean type (or define TRUE or FALSE).
+
+date_time
+=========
+
+Has the functions for parsing and producing the strings of any time
+and dates.
+
+event
+=====
+
+Each entry in the calendar is an event, each event includes a date and
+a time.
+
+event_list
+==========
+
+This is what would be considered the calendar in memory. It is a
+linked list of all the events, has the functions you would expect. It
+also has iterator type functions so any callers don't need to know the
+internals of the linked list.
+
+calendar_file
+=============
+
+This is used for loading and saving calendars (event_list) to disk in
+the required format.
+
+assignment_state
+================
+
+Defines a struct that is passed around the various GUI callbacks.
+
+ui_assignment
+=============
+
+The GUI code, just brings all the different event_list and
+calendar_file functions together to provide the user interface.
+
+assignment
+==========
+
+The main file, it's very simple, all it does is attempt any loading of
+a calendar file from the command line and start the GUI.
