@@ -358,11 +358,12 @@ static enum DateTimeError checkDay(int year, int month, int day)
   int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   int max_days;
   enum DateTimeError result;
+  const int FEBURARY = 2;
 
   result = DATETIME_NO_ERROR;
   max_days = days_in_month[month - 1];
 
-  if (isLeapYear(year) && (month == 2)) {
+  if (isLeapYear(year) && (month == FEBURARY)) {
     max_days = 29;
   }
 
@@ -373,6 +374,15 @@ static enum DateTimeError checkDay(int year, int month, int day)
   return result;
 }
 
+/*
+ * Given a string, update the given time struct.
+ *
+ * Returns a DATETIME_INVALID error, if there's a problem.
+ * DATE_NO_ERROR otherwise.
+ *
+ * stTime - Time string to parse, expected to be in FILE_TIME_FORMAT.
+ * time - Pointer to time struct to update.
+ */
 static enum DateTimeError parseTimeString(const char *const stTime,
     struct Time *time)
 {
@@ -399,6 +409,12 @@ static enum DateTimeError parseTimeString(const char *const stTime,
   return error_result;
 }
 
+/*
+ * Validate Time
+ *
+ * Checks that minutes is never greater than 59, hours are from 0 -
+ * 24, and that the 24th hour has 0 minutes.
+ */
 static enum DateTimeError validateTime(int hour, int minutes)
 {
   enum DateTimeError result;
