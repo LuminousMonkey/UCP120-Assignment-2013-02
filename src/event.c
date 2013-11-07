@@ -19,9 +19,10 @@
  */
 static void updateEventString(struct Event *const event);
 static Boolean durationValid(int duration);
-static enum EventError eventSetName(struct Event *const event, const char *const name);
-static enum EventError eventSetLocation(const char *const name,
-                                        char **location);
+static enum EventError eventSetName(struct Event *const event,
+                                    const char *const name);
+static enum EventError eventSetLocation(struct Event *const event,
+                                        const char *const location);
 void eventDestroy(struct Event *event);
 
 /*
@@ -57,7 +58,7 @@ enum EventError eventCreate(struct Event **new_event,
 
           if (name != NULL && name[0] != '\0') {
             eventSetName(*new_event, name);
-            eventSetLocation(location, & (*new_event)->location);
+            eventSetLocation(*new_event, location);
 
             updateEventString(*new_event);
 
@@ -112,14 +113,11 @@ enum EventError eventEdit(struct Event *event_to_edit,
 
   if (error_result == EVENT_NO_ERROR) {
     /*
-     * The data passed in must be good. Copy it across. Have to first
-     * free the strings that the old version of the event has.
+     * No error creating the event, so it validates, update the old
+     * event to match.
      */
-    free(event_to_edit->name);
-    free(event_to_edit->location);
-
     eventSetName(event_to_edit, temp_event->name);
-    eventSetLocation(temp_event->location, &(event_to_edit->location));
+    eventSetLocation(event_to_edit, temp_event->location);
     event_to_edit->date = temp_event->date;
     event_to_edit->time = temp_event->time;
     event_to_edit->duration = temp_event->duration;
@@ -223,7 +221,14 @@ static void updateEventString(struct Event *const event)
   event->formatted_string_length = string_length;
 }
 
-static enum EventError eventSetName(struct Event *const event, const char *const name)
+/*
+ * Copies over the name string into the given event.
+ *
+ * event - Event that we want to update.
+ * name - String that the event's name should be updated to.
+ */
+static enum EventError eventSetName(struct Event *const event,
+                                    const char *const name)
 {
   enum EventError result;
   size_t name_length;
@@ -231,11 +236,15 @@ static enum EventError eventSetName(struct Event *const event, const char *const
   result = EVENT_NO_ERROR;
   name_length = 0;
 
+  assert(event != NULL);
+
   if (name != NULL) {
     name_length = strnlen(name, MAX_LENGTH_OF_NAME);
   }
 
   if (name_length > 0) {
+    /* Free up memory already allocated to the existing event name. */
+    free(event->name);
     event->name = (char *) malloc(name_length + 1);
 
     if (event->name != NULL) {
@@ -251,27 +260,33 @@ static enum EventError eventSetName(struct Event *const event, const char *const
   return result;
 }
 
-static enum EventError eventSetLocation(const char *const location,
-                                        char **event_location)
+static enum EventError eventSetLocation(struct Event *const event,
+                                        const char *const location)
 {
   enum EventError result;
   size_t location_length;
 
   result = EVENT_NO_ERROR;
   location_length = 0;
-  *event_location = NULL;
+
+  assert(event);
+
+  /* Location is allowed to be NULL, so free the memory now. */
+  free(event->location);
+  event->location = NULL;
 
   if (location != NULL) {
     location_length = strnlen(location, MAX_LENGTH_OF_LOCATION);
   }
 
   if (location_length > 0) {
-    *event_location = (char *) malloc(location_length + 1);
+    event->location = (char *) malloc(location_length + 1);
 
-    if (*event_location != NULL) {
-      **event_location = '\0';
-      strncat(*event_location, location, location_length);
+    if (event->location != NULL) {
+      *event->location = '\0';
+      strncat(event->location, location, location_length);
     } else {
+      /* Couldn't allocate memory. */
       result = EVENT_INTERNAL_ERROR;
     }
   }
