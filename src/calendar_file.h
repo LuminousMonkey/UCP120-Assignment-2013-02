@@ -24,8 +24,7 @@
  * are able to open the file, or we can't. If we can't, then it will
  * return a non-specific FILE_ERROR.
  *
- * FILE_NOTHING_READ is returned when an empty string has been read.
- *
+
  * FILE_INTERNAL_ERROR is a non-expected, probably non-recoverable error.
  * Try your best to clean up as much as possible.
  */
