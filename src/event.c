@@ -17,7 +17,7 @@
 /*
  * Forward declarations.
  */
-static int eventString(struct Event *const event);
+static void updateEventString(struct Event *const event);
 static Boolean durationValid(int duration);
 static enum EventError eventSetName(const char *const name, char **event_name);
 static enum EventError eventSetLocation(const char *const name,
@@ -59,7 +59,8 @@ enum EventError eventCreate(struct Event **new_event,
             eventSetName(name, &(*new_event)->name);
             eventSetLocation(location, & (*new_event)->location);
 
-            (*new_event)->formatted_string_length = eventString(*new_event);
+            updateEventString(*new_event);
+
           } else {
             error_result = EVENT_NAME_INVALID;
           }
@@ -128,7 +129,7 @@ enum EventError eventEdit(struct Event *event_to_edit,
      * want to make sure mistake here show up quickly in the
      * textbox.
      */
-    eventString(event_to_edit);
+    updateEventString(event_to_edit);
     event_to_edit->formatted_string_length =
       strlen(event_to_edit->formatted_string);
   }
@@ -166,7 +167,7 @@ void eventDestroy(struct Event *event)
  *
  * event - Event to build the formatted string for.
  */
-static int eventString(struct Event *const event)
+static void updateEventString(struct Event *const event)
 {
   int string_length;
 
