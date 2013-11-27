@@ -423,7 +423,7 @@ static enum DateTimeError validateTime(int hour, int minutes)
 
   if ((hour > MAX_HOURS) || (hour < 0)) {
     result = DATETIME_HOUR_INVALID;
-  } else if ((MAX_MINUTES > 59) || (minutes < 0)) {
+  } else if ((minutes > MAX_MINUTES) || (minutes < 0)) {
     result = DATETIME_MINUTES_INVALID;
   } else if ((hour == MAX_HOURS) && (minutes > 0)) {
     result = DATETIME_MINUTES_INVALID;
