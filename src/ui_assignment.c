@@ -345,8 +345,11 @@ static void uiEditEvent(void *in_data)
 
       /* Copy the found event strings over to the edit box */
       strncat(dialog_fields.name, event_to_edit->name, MAX_LENGTH_OF_NAME);
-      strncat(dialog_fields.location, event_to_edit->location,
-              MAX_LENGTH_OF_LOCATION);
+
+      if (event_to_edit->location != NULL ) {
+        strncat(dialog_fields.location, event_to_edit->location,
+                MAX_LENGTH_OF_LOCATION);
+      }
 
       sprintf(dialog_fields.date, "%04d-%02d-%02d",
               event_to_edit->date.year,
